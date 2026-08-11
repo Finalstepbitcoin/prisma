@@ -1,0 +1,14 @@
+# Le liste di parole NON vanno nel repository: si scaricano dalle fonti
+# originali con gli script prepara_*.py, e ognuna ha la propria licenza.
+wordlist.py
+diceware_en.py
+diceware_it.py
+
+# Il firmware MicroPython si scarica da micropython.org
+firmware/
+
+# Roba di Python
+__pycache__/
+*.pyc
+.DS_Store
+.venv-strumenti/
