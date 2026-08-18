@@ -5,7 +5,7 @@ Un piccolo dispositivo **offline** che fa due cose sole:
 1. **completa un seed BIP39** — gli dai le prime 11 (o 23) parole, lui calcola l'ultima
 2. **genera una passphrase col metodo Diceware** — tu tiri i dadi, lui traduce i numeri in parole
 
-Costa circa **18 euro** di componenti (a cui va aggiunto il case), non ha WiFi né Bluetooth, non salva niente
+Costa circa **20 euro** di componenti (aggiornato al 19 agosto 2026, a cui va aggiunto il case), non ha WiFi né Bluetooth, non salva niente
 e il firmware è ispezionabile e riscrivibile da chiunque.
 
 Canale YouTube: [Final Step Bitcoin](https://www.youtube.com/@final_step_bitcoin)
