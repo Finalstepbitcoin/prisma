@@ -23,7 +23,7 @@ Canale YouTube: [Final Step Bitcoin](https://www.youtube.com/@final_step_bitcoin
 **Attenzione a non prendere la versione "W"** del Pico: quella ha WiFi e Bluetooth,
 e vanifica tutto il senso del progetto.
 
-Niente saldature: i tre pezzi si incastrano. Il display va montato allineando il
+I due pezzi si incastrano. Il display va montato allineando il
 simbolo USB stampato sul suo circuito con il connettore USB del Pico.
 
 ---
