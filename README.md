@@ -5,7 +5,7 @@ Un piccolo dispositivo **offline** che fa due cose sole:
 1. **completa un seed BIP39** — gli dai le prime 11 (o 23) parole, lui calcola l'ultima
 2. **genera una passphrase col metodo Diceware** — tu tiri i dadi, lui traduce i numeri in parole
 
-Costa circa **15 euro** di componenti, non ha WiFi né Bluetooth, non salva niente
+Costa circa **18 euro** di componenti (a cui va aggiunto il case), non ha WiFi né Bluetooth, non salva niente
 e il firmware è ispezionabile e riscrivibile da chiunque.
 
 Canale YouTube: [Final Step Bitcoin](https://www.youtube.com/@final_step_bitcoin)
@@ -16,8 +16,8 @@ Canale YouTube: [Final Step Bitcoin](https://www.youtube.com/@final_step_bitcoin
 
 | Pezzo | Codice | Prezzo |
 |---|---|---|
-| Raspberry Pi Pico 2 con header | `RPI-PICO2-H` | ~5,50 € |
-| Waveshare Pico-LCD-1.3 (240×240, joystick + 4 tasti) | `WS-19650` | ~6,90 € |
+| Raspberry Pi Pico 2 con header | `RPI-PICO2-H` | ~7 € |
+| Waveshare Pico-LCD-1.3 (240×240, joystick + 4 tasti) | `WS-19650` | ~9 € |
 | Cavo micro-USB **dati** | `RPI-MUSB-1` | ~1,80 € |
 
 **Attenzione a non prendere la versione "W"** del Pico: quella ha WiFi e Bluetooth,
