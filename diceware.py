@@ -24,13 +24,20 @@ ATTENZIONE, DIFFERENZA IMPORTANTE COL SEED
 
 # 12,9248 bit per parola: log in base 2 di 7776.
 #
-# La tabella qui sotto e' in DECIMI DI BIT e riporta gli stessi identici
-# valori stampati sulla scheda di carta "Dai dadi alle parole Diceware".
-# E' scritta a mano di proposito: cosi' schermo e carta non possono
-# discordare per un arrotondamento diverso (il dispositivo gira MicroPython,
-# la scheda si genera con Python del Mac: due implementazioni diverse dei
-# numeri a virgola mobile potrebbero, in teoria, arrotondare in modo diverso
-# lo stesso calcolo dal vivo).
+# La tabella qui sotto e' in DECIMI DI BIT. Solo i primi undici valori
+# (indici 0-10, cioe' fino a 10 parole) sono gli stessi identici stampati
+# sulla scheda di carta "Dai dadi alle parole Diceware" - scritti a mano di
+# proposito, cosi' schermo e carta non possono discordare per un
+# arrotondamento diverso (il dispositivo gira MicroPython, la scheda si
+# genera con Python del Mac: due implementazioni diverse dei numeri a
+# virgola mobile potrebbero, in teoria, arrotondare in modo diverso lo
+# stesso calcolo dal vivo).
+#
+# Da 11 a 20 parole (il massimo, oltre le dieci righe di una scheda) i
+# valori sono calcolati con la STESSA formula ma non sono stampati da
+# nessuna parte: la scheda resta a dieci righe, se ne servono di piu' se
+# ne usano due. Chi arriva a quelle parole legge il totale dei bit solo
+# qui sullo schermo.
 BIT_DECIMI = (0, 129, 258, 388, 517, 646, 775, 905, 1034, 1163, 1292,
               1422, 1551, 1680, 1809, 1939, 2068, 2197, 2326, 2456, 2585)
 
