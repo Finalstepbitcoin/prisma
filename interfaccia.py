@@ -694,7 +694,11 @@ class Interfaccia:
             # al massimo, "A) piu" premere A chiuderebbe comunque la
             # sessione (il controllo all'inizio del ciclo lo impedisce): il
             # tasto va rietichettato, non lasciato a promettere un'undicesima
-            # parola che non arriva mai
+            # parola che non arriva mai. "B) canc" c'e' sempre, anche sotto
+            # il massimo: prima l'unico modo di correggere l'ultima parola
+            # era premere A e poi B nella schermata dei dadi successiva,
+            # un giro inutile - e al massimo quel giro non era nemmeno
+            # disponibile, perche' non c'e' "una parola successiva".
             al_massimo = len(parole) >= dw.MASSIMO_PAROLE
             self.sc.pulisci(s.NERO)
             self._centrata(cifre, 18, s.GRIGIO, 2)
@@ -704,12 +708,20 @@ class Interfaccia:
             self._centrata("%d parole" % len(parole), 136, s.BIANCO, 2)
             self._centrata("%s bit" % dw.bit_testo(len(parole)), 166,
                            s.ARANCIO if abbastanza else s.GIALLO, 2)
-            self._piede("A) fine" if al_massimo else "A) piu", "Y) fine")
+            if al_massimo:
+                self._piede("A) fine", "B) canc")
+            else:
+                self._piede("A) piu  B) canc", "Y) fine")
             self.sc.mostra()
 
             t = self.cm.attendi()
-            while t not in ("A", "centro", "Y"):
+            while t not in ("A", "centro", "Y", "B"):
                 t = self.cm.attendi()
+            if t == "B":
+                # ritira l'ultima parola e la richiede da capo: stessa
+                # schermata dei dadi di sempre, non una speciale
+                parole.pop()
+                continue
             if t != "Y":
                 continue
 
