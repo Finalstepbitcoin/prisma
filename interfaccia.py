@@ -540,30 +540,54 @@ class Interfaccia:
 
     def mostra_passphrase(self, parole):
         """
-        L'elenco numerato, tutto su una schermata sola.
+        L'elenco numerato.
 
-        Niente scorrimento: fino a sette parole si scrive grande, da otto a
-        dieci un po' piu' piccolo ma ci stanno tutte. Uno scorrimento qui
-        confonderebbe e basta - chi ricopia vuole vedere tutto insieme.
+        Fino a dieci parole: tutte su una schermata sola, senza scorrimento -
+        fino a sette si scrive grande, da otto a dieci un po' piu' piccolo ma
+        ci stanno tutte. Oltre le dieci (fino al massimo di venti) la lista
+        si spezza in due schermate da dieci: una freccia nel margine (stesso
+        segno usato in mostra_unita) indica che ce n'e' un'altra, destra e
+        sinistra ci si passa. La numerazione continua da una schermata
+        all'altra, non riparte da 1.
         """
-        grande = len(parole) <= 7
+        paginato = len(parole) > 10
+        grande = (not paginato) and len(parole) <= 7
         scala = 2 if grande else 1
         passo = 23 if grande else 16
+        n_pagine = 2 if paginato else 1
+        pagina = 0
 
-        self._intestazione("LE TUE PAROLE")
-        y = 38
-        for i, p in enumerate(parole):
-            self.sc.scritta("%2d" % (i + 1), 8, y + (3 if grande else 0),
-                            s.GRIGIO, 1)
-            self.sc.scritta(p, 34, y, s.BIANCO, scala)
-            y += passo
-        self._centrata("%d parole   %s bit"
-                       % (len(parole), dw.bit_testo(len(parole))),
-                       192, s.ARANCIO, 1)
-        self._piede("A) avanti")
-        self.sc.mostra()
-        while self.cm.attendi() not in ("A", "centro"):
-            pass
+        while True:
+            self._intestazione("LE TUE PAROLE")
+            inizio = pagina * 10
+            y = 38
+            for i, p in enumerate(parole[inizio:inizio + 10], start=inizio):
+                self.sc.scritta("%2d" % (i + 1), 8, y + (3 if grande else 0),
+                                s.GRIGIO, 1)
+                self.sc.scritta(p, 34, y, s.BIANCO, scala)
+                y += passo
+
+            # le frecce stanno nel margine vuoto a fianco delle righe, non
+            # sopra: cosi' non tolgono spazio verticale, che con dieci righe
+            # e' gia' tutto occupato
+            if paginato and pagina > 0:
+                self.sc.scritta("<", 0, 100, s.ARANCIO, 1)
+            if paginato and pagina < n_pagine - 1:
+                self.sc.scritta(">", 230, 100, s.ARANCIO, 1)
+
+            self._centrata("%d parole   %s bit"
+                           % (len(parole), dw.bit_testo(len(parole))),
+                           192, s.ARANCIO, 1)
+            self._piede("A) avanti")
+            self.sc.mostra()
+
+            t = self.cm.attendi()
+            if t in ("A", "centro"):
+                return
+            if paginato and t == "destra" and pagina < n_pagine - 1:
+                pagina += 1
+            elif paginato and t == "sinistra" and pagina > 0:
+                pagina -= 1
 
     def mostra_unita(self, parole):
         """

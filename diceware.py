@@ -27,10 +27,14 @@ ATTENZIONE, DIFFERENZA IMPORTANTE COL SEED
 # La tabella qui sotto e' in DECIMI DI BIT e riporta gli stessi identici
 # valori stampati sulla scheda di carta "Dai dadi alle parole Diceware".
 # E' scritta a mano di proposito: cosi' schermo e carta non possono
-# discordare per un arrotondamento diverso.
-BIT_DECIMI = (0, 129, 258, 388, 517, 646, 775, 905, 1034, 1163, 1292)
+# discordare per un arrotondamento diverso (il dispositivo gira MicroPython,
+# la scheda si genera con Python del Mac: due implementazioni diverse dei
+# numeri a virgola mobile potrebbero, in teoria, arrotondare in modo diverso
+# lo stesso calcolo dal vivo).
+BIT_DECIMI = (0, 129, 258, 388, 517, 646, 775, 905, 1034, 1163, 1292,
+              1422, 1551, 1680, 1809, 1939, 2068, 2197, 2326, 2456, 2585)
 
-MASSIMO_PAROLE = 10        # come le dieci righe della scheda di carta
+MASSIMO_PAROLE = 20        # due schermate da dieci parole
 CONSIGLIATE = 6            # sotto le sei parole il dispositivo avvisa
 DADI = 5
 
