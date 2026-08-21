@@ -152,6 +152,17 @@ def esegui():
 
     print("\nMODALITA' DADI")
 
+    # Le schermate da confermare con A DOPO che si e' deciso di fermarsi:
+    # TUTTE LE PASSPHRASE, SE SBAGLI A SCRIVERLA, COPIA L'ELENCO NUMERATO,
+    # l'elenco stesso (mostra_passphrase), COPIA LA PASSPHRASE PER INTERO,
+    # GLI SPAZI FANNO PARTE, la passphrase intera (mostra_unita). Un unico
+    # numero con nome invece che ripetuto a mano in ogni prova: e' proprio
+    # perche' era ripetuto a mano che l'aggiunta di "GLI SPAZI FANNO PARTE"
+    # (issue #3) aveva lasciato queste prove indietro di una schermata
+    # senza che nessuno se ne accorgesse, finche' non si sono rilanciate
+    # per davvero sul dispositivo.
+    SCHERMATE_FINALI = 7
+
     for lingua, indice in (("inglese", 0), ("italiano", 1)):
         def dadi(indice=indice):
             lista = dw.Lista("en" if indice == 0 else "it")
@@ -162,7 +173,7 @@ def esegui():
             for n, t in enumerate(tiri):
                 seq += tasti_per_dadi(i, t)
                 seq.append("Y" if n == len(tiri) - 1 else "A")
-            seq += ["A"] * 6
+            seq += ["A"] * SCHERMATE_FINALI
             con_tasti(i, seq)
             i.modalita_diceware()
             del lista
@@ -176,7 +187,7 @@ def esegui():
         seq += ["A"]                                  # "Continua"
         seq += tasti_per_dadi(i, "44444") + ["Y"]     # secondo avviso
         seq += ["giu", "A"]                           # "Basta cosi'"
-        seq += ["A"] * 6
+        seq += ["A"] * SCHERMATE_FINALI
         con_tasti(i, seq)
         i.modalita_diceware()
     prova("dadi, avviso ripetuto sotto le 6 parole", dadi_avviso)
@@ -185,6 +196,40 @@ def esegui():
         con_tasti(i, ["A", "A", "B"])
         i.modalita_diceware()
     prova("dadi, uscita subito con B", dadi_esce)
+
+    def dadi_annulla():
+        """Il tasto B) canc sulla schermata di conferma (non quello dentro
+        chiedi_dadi, gia' provato da dadi_esce): tira 3 parole, alla terza
+        si annulla e la ritira, poi si ferma con l'avviso sotto le 6."""
+        seq = ["A", "A"]
+        seq += tasti_per_dadi(i, "11111") + ["A"]      # parola 1
+        seq += tasti_per_dadi(i, "22222") + ["A"]      # parola 2
+        seq += tasti_per_dadi(i, "33333") + ["B"]      # parola 3, ripensata...
+        seq += tasti_per_dadi(i, "44444") + ["Y"]      # ...ritirata, e si ferma qui
+        seq += ["giu", "A"]                            # avviso "Basta cosi'"
+        seq += ["A"] * SCHERMATE_FINALI
+        con_tasti(i, seq)
+        i.modalita_diceware()
+    prova("dadi, annulla l'ultima parola con B) canc", dadi_annulla)
+
+    def dadi_due_schermate():
+        """Con piu' di 10 parole l'elenco numerato si spezza in due
+        schermate (mostra_passphrase): qui si naviga davvero alla seconda
+        pagina con la freccia invece di limitarsi a premere subito A,
+        cosi' anche quel percorso viene ripercorso e non solo letto."""
+        tiri = ["52431", "11111", "66666", "34251", "16234", "44444",
+                "22222", "33333", "55555", "65432", "14263", "36251"]
+        seq = ["A", "A"]
+        for n, t in enumerate(tiri):
+            seq += tasti_per_dadi(i, t)
+            seq.append("Y" if n == len(tiri) - 1 else "A")
+        seq += ["A", "A", "A"]        # i tre avvisi prima dell'elenco
+        seq += ["destra", "A"]        # elenco su due pagine: vai alla seconda, poi fine
+        seq += ["A", "A"]             # i due avvisi prima della passphrase intera
+        seq += ["A"]                  # passphrase intera
+        con_tasti(i, seq)
+        i.modalita_diceware()
+    prova("dadi, 12 parole, doppia schermata dell'elenco", dadi_due_schermate)
 
     print("\nMENU")
 
