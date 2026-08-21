@@ -379,7 +379,11 @@ def main():
         return 1
 
     pico = Pico()
-    print("Scheda su %s\n" % pico.porta)
+    # su stderr, apposta: chi legge questo programma da terminale lo vede
+    # comunque, ma chi lo chiama da un altro script (installa.py, per la
+    # lista dei file sulla scheda) non si ritrova questa riga mescolata
+    # all'output vero del comando
+    print("Scheda su %s\n" % pico.porta, file=sys.stderr)
     try:
         pico.entra_grezza()
         cmd = sys.argv[1]
