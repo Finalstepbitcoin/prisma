@@ -573,18 +573,22 @@ class Interfaccia:
         l'elenco numerato dice quali sono le parole, questa dice com'e'
         fatta la passphrase per davvero.
         """
-        # SENZA SPAZI: la passphrase e' questa stringa qui, tutta
-        # attaccata. E' questa che va digitata, carattere per carattere.
+        # CON UNO SPAZIO fra le parole: e' questa la stringa da digitare,
+        # carattere per carattere, spazi compresi. Senza uno spazio a
+        # separarle la stringa non sarebbe univoca - alcune voci delle
+        # liste Diceware sono l'inizio di altre voci (es. "a" e "aa"), quindi
+        # tiri di dadi diversi potrebbero incollarsi nella stessa identica
+        # passphrase. Lo spazio e' quello che lo impedisce.
         # L'elenco numerato della schermata prima serve solo a controllare
         # di non aver saltato una parola.
-        testo = "".join(parole)
+        testo = " ".join(parole)
         FINESTRA = 14          # quanti caratteri grandi ci stanno
         pos = 0
         massimo = max(0, len(testo) - FINESTRA)
 
         while True:
             self._intestazione("LA PASSPHRASE")
-            self._centrata("%d caratteri, senza spazi" % len(testo), 40, s.GRIGIO, 1)
+            self._centrata("%d caratteri, CON gli spazi" % len(testo), 40, s.GRIGIO, 1)
 
             pezzo = testo[pos:pos + FINESTRA]
             self.sc.fill_rect(0, 90, 240, 44, s.colore(20, 20, 20))
@@ -710,6 +714,11 @@ class Interfaccia:
         self._messaggio(["COPIA", "L'ELENCO", "NUMERATO"], s.GIALLO)
         self.mostra_passphrase(parole)
         self._messaggio(["COPIA LA", "PASSPHRASE", "PER INTERO"], s.GIALLO)
+        # Lo spazio fra le parole e' parte della passphrase, non un a capo
+        # visivo: senza, parole diverse potrebbero incollarsi in modo
+        # ambiguo. Va detto qui, esplicitamente, prima di mostrarla.
+        self._messaggio(["GLI SPAZI", "FANNO PARTE", "DELLA", "PASSPHRASE"],
+                        s.GIALLO)
         self.mostra_unita(parole)
 
         for i in range(len(parole)):
