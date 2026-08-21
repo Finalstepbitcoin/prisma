@@ -30,6 +30,14 @@ import re
 import sys
 import urllib.request
 
+# "impronta_attesa": la SHA-256 della lista scaricata e verificata il 21
+# agosto 2026, quella con cui e' stato costruito il dispositivo. Se la fonte
+# restituisse un contenuto diverso lo script si ferma prima di generare
+# firmware da una lista diversa da quella attesa.
+#
+# Per aggiornarla DI PROPOSITO: scarica la nuova lista, controllane il
+# contenuto a mano (es. confrontandola con la scheda di carta pubblicata),
+# poi incolla qui il nuovo SHA-256.
 LISTE = [
     {
         "nome": "inglese",
@@ -38,6 +46,7 @@ LISTE = [
         "licenza": "CC-BY 4.0",
         "url": "https://theworld.com/~reinhold/diceware.wordlist.asc",
         "pagina": "https://theworld.com/~reinhold/diceware.html",
+        "impronta_attesa": "3cd6164a99e95381f8620aec782a933545bcd5833fa331d267a6829f6665256e",
     },
     {
         "nome": "italiana",
@@ -49,6 +58,7 @@ LISTE = [
                "word_list_diceware_it-IT-4.txt",
         "pagina": "https://www.taringamberini.com/it/diceware_it_IT/"
                   "lista-di-parole-diceware-in-italiano/",
+        "impronta_attesa": "b441559b64fb7041b9bbcecb3c43111f2523ec84e172670409f40c462eda0b93",
     },
 ]
 
@@ -168,6 +178,17 @@ def main():
         print("\nLista %s (%s, %s)" % (lista["nome"], lista["autore"], lista["licenza"]))
         testo = scarica(lista["url"])
         impronta = hashlib.sha256(testo.encode("utf-8")).hexdigest()
+
+        if impronta != lista["impronta_attesa"]:
+            print("  LISTA NON VALIDA, non genero niente:")
+            print("    - impronta diversa da quella attesa")
+            print("      atteso : %s" % lista["impronta_attesa"])
+            print("      trovato: %s" % impronta)
+            print("    Puo' essere una fonte cambiata (anche in modo legittimo)")
+            print("    oppure qualcosa in mezzo al download. Controlla il nuovo")
+            print("    contenuto a mano prima di aggiornare impronta_attesa qui.")
+            sys.exit(1)
+
         voci = estrai(testo)
 
         errori = controlla(voci)

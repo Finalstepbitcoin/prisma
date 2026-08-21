@@ -12,6 +12,7 @@ Uso:
     python3 test_diceware.py
 """
 
+import hashlib
 import re
 import sys
 import urllib.request
@@ -59,6 +60,17 @@ def test_lista(codice, dati):
     # riscarico la lista dalla fonte e confronto voce per voce
     with urllib.request.urlopen(dati["url"], timeout=60) as r:
         testo = r.read().decode("utf-8", "replace")
+
+    # non basta che la fonte risponda: deve essere la STESSA fonte gia'
+    # pinnata in prepara_diceware.py, altrimenti questo test si limiterebbe
+    # a fidarsi di un secondo download della stessa fonte, magari compromessa
+    # allo stesso modo del primo.
+    impronta = hashlib.sha256(testo.encode("utf-8")).hexdigest()
+    verifica(impronta == dati["impronta_attesa"],
+             "la fonte %s non corrisponde piu' all'impronta pinnata "
+             "(atteso %s, trovato %s)"
+             % (dati["nome"], dati["impronta_attesa"], impronta))
+
     vere = dict(re.findall(r"^([1-6]{5})[ \t]+(\S+)[ \t]*$", testo, re.M))
     verifica(len(vere) == ATTESE, "la fonte non ha %d voci" % ATTESE)
 

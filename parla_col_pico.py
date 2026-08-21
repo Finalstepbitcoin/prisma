@@ -14,6 +14,7 @@ Uso:
     python3 parla_col_pico.py info
     python3 parla_col_pico.py esegui "print(1+1)"
     python3 parla_col_pico.py copia bip39_checksum.py
+    python3 parla_col_pico.py verifica bip39_checksum.py
     python3 parla_col_pico.py elenco
 
 Come funziona: MicroPython espone una "REPL grezza" (raw REPL), un canale
@@ -22,6 +23,7 @@ Si entra con CTRL-A, si manda il codice, si esegue con CTRL-D.
 """
 
 import glob
+import hashlib
 import os
 import select
 import sys
@@ -162,13 +164,33 @@ def comando_elenco(pico):
     return comando_esegui(pico, "import os\nfor f in os.listdir('/'): print(f)\n")
 
 
+def _cancella_su_scheda(pico, nome):
+    """Best-effort: non importa se il file non c'era gia'."""
+    pico.esegui("import os\ntry:\n    os.remove(%r)\nexcept OSError:\n    pass\n" % nome)
+
+
 def comando_copia(pico, percorso):
+    """
+    Copia con un file temporaneo + verifica del CONTENUTO + scambio finale.
+
+    Perche' non basta scrivere direttamente sul nome vero: se il cavo si
+    stacca o il trasferimento si interrompe a meta', il file di destinazione
+    resterebbe troncato. Scrivendo su un nome temporaneo e spostandolo sopra
+    solo DOPO che il contenuto e' stato verificato byte per byte, un
+    trasferimento interrotto lascia intatta l'ultima versione buona.
+
+    E perche' l'hash e non solo la dimensione: due file della stessa
+    lunghezza possono avere contenuto diverso (un pezzo corrotto in
+    trasmissione, per esempio). Solo un confronto del contenuto lo rileva.
+    """
     nome = os.path.basename(percorso)
+    temporaneo = "." + nome + ".tmp"
     with open(percorso, "rb") as f:
         dati = f.read()
+    impronta_attesa = hashlib.sha256(dati).hexdigest()
 
     print("Copio %s (%d byte) sulla scheda..." % (nome, len(dati)))
-    uscita, errore = pico.esegui("f = open(%r, 'wb')\n" % nome)
+    uscita, errore = pico.esegui("f = open(%r, 'wb')\n" % temporaneo)
     if errore.strip():
         print(errore)
         return 1
@@ -180,20 +202,100 @@ def comando_copia(pico, percorso):
         uscita, errore = pico.esegui("f.write(%r)\n" % blocco)
         if errore.strip():
             print("\nERRORE durante la scrittura:", errore.strip())
+            pico.esegui("f.close()\n")
+            _cancella_su_scheda(pico, temporaneo)
             return 1
         inviati += len(blocco)
         print("\r  %d%%" % (100 * inviati // len(dati)), end="", flush=True)
     print()
-
     pico.esegui("f.close()\n")
 
-    # controprova: rileggo la dimensione dalla scheda
-    uscita, _ = pico.esegui("import os\nprint(os.stat(%r)[6])\n" % nome)
-    scritti = int(uscita.strip())
-    if scritti != len(dati):
-        print("ERRORE: sulla scheda ci sono %d byte invece di %d" % (scritti, len(dati)))
+    # confronto del CONTENUTO, calcolato sulla scheda: non solo la
+    # dimensione, che una corruzione a parita' di byte non rileverebbe
+    codice_hash = (
+        "import hashlib\n"
+        "h = hashlib.sha256()\n"
+        "with open(%r, 'rb') as fv:\n"
+        "    while True:\n"
+        "        pezzo = fv.read(1024)\n"
+        "        if not pezzo:\n"
+        "            break\n"
+        "        h.update(pezzo)\n"
+        "print(h.digest().hex())\n"
+    ) % temporaneo
+    uscita, errore = pico.esegui(codice_hash)
+    if errore.strip():
+        print("ERRORE calcolando l'impronta sulla scheda:", errore.strip())
+        _cancella_su_scheda(pico, temporaneo)
         return 1
-    print("Copiato e verificato: %d byte." % scritti)
+    impronta_scheda = uscita.strip()
+    if impronta_scheda != impronta_attesa:
+        print("ERRORE: impronta diversa dopo la copia.")
+        print("  atteso : %s" % impronta_attesa)
+        print("  scheda : %s" % impronta_scheda)
+        _cancella_su_scheda(pico, temporaneo)
+        return 1
+
+    # solo ORA, con contenuto verificato, si sostituisce il file vero: se
+    # la corrente si interrompe qui, nel peggiore dei casi resta il file
+    # temporaneo (gia' valido) accanto a quello vecchio, mai un file a meta'
+    codice_scambio = (
+        "import os\n"
+        "try:\n"
+        "    os.remove(%r)\n"
+        "except OSError:\n"
+        "    pass\n"
+        "os.rename(%r, %r)\n"
+    ) % (nome, temporaneo, nome)
+    uscita, errore = pico.esegui(codice_scambio)
+    if errore.strip():
+        print("ERRORE sostituendo il file:", errore.strip())
+        return 1
+
+    print("Copiato e verificato: %d byte, SHA-256 %s..." % (len(dati), impronta_attesa[:12]))
+    return 0
+
+
+def comando_verifica(pico, percorso):
+    """
+    Confronta l'hash del file sulla scheda con quello del file sul Mac,
+    SENZA ritrasferire il contenuto. Usato da installa.py per la verifica
+    finale: prova che ogni file installato corrisponde davvero a quello
+    atteso, non solo che qualcosa con quel nome esiste.
+    """
+    nome = os.path.basename(percorso)
+    with open(percorso, "rb") as f:
+        attesa = hashlib.sha256(f.read()).hexdigest()
+
+    codice = (
+        "import hashlib, os\n"
+        "try:\n"
+        "    os.stat(%r)\n"
+        "except OSError:\n"
+        "    print('MANCANTE')\n"
+        "else:\n"
+        "    h = hashlib.sha256()\n"
+        "    with open(%r, 'rb') as fv:\n"
+        "        while True:\n"
+        "            pezzo = fv.read(1024)\n"
+        "            if not pezzo:\n"
+        "                break\n"
+        "            h.update(pezzo)\n"
+        "    print(h.digest().hex())\n"
+    ) % (nome, nome)
+    uscita, errore = pico.esegui(codice)
+    if errore.strip():
+        print("DIVERSO   %-20s (errore: %s)" % (nome, errore.strip()))
+        return 1
+
+    trovata = uscita.strip()
+    if trovata == "MANCANTE":
+        print("MANCANTE  %s" % nome)
+        return 1
+    if trovata != attesa:
+        print("DIVERSO   %s" % nome)
+        return 1
+    print("ok        %s" % nome)
     return 0
 
 
@@ -222,6 +324,8 @@ def main():
             return comando_esegui(pico, sys.argv[2] + "\n")
         if cmd == "copia":
             return comando_copia(pico, sys.argv[2])
+        if cmd == "verifica":
+            return comando_verifica(pico, sys.argv[2])
         if cmd == "lancia":
             # avvia del codice che NON finisce (tipo l'interfaccia) e lascia
             # la scheda a girare per conto suo, senza aspettare la fine

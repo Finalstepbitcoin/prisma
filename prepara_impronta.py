@@ -36,6 +36,20 @@ ZONA_FIRMWARE = 448 * 1024
 FAMIGLIA_RP2350 = 0xE48BFF59     # blocchi di programma per questo chip
 PAROLE = 3
 
+# La release di MicroPython con cui e' stato costruito il dispositivo,
+# verificata il 21 agosto 2026. trova_uf2() non si fida piu' di "l'ultimo
+# file .uf2 che trovo": il contenuto deve corrispondere esattamente a
+# questo, altrimenti ci si potrebbe ritrovare a firmare come "impronta
+# attesa" un'immagine sconosciuta o modificata.
+#
+# Per aggiornarla DI PROPOSITO (nuova versione di MicroPython): scarica il
+# .uf2 da micropython.org, controllane la provenienza, poi incolla qui nome
+# e SHA-256 del file nuovo.
+UF2_ATTESO = {
+    "nome": "RPI_PICO2-20260406-v1.28.0.uf2",
+    "sha256": "e65ad62ae886a4f56da8ef2c07904fe504b92de69e5ae6489acf881bcf30b6ae",
+}
+
 # I file che vengono installati sul dispositivo. QUESTA LISTA E' LA STESSA
 # usata da installa.py: se le due divergono, l'impronta calcolata qui non
 # corrispondera' a quella mostrata dal dispositivo.
@@ -95,13 +109,48 @@ def immagine_flash(percorso_uf2):
 
 
 def trova_uf2():
+    """
+    Tutti i file .uf2 trovati in firmware/ o nella cartella corrente
+    (non solo l'ultimo per nome: la scelta vera la fa verifica_uf2()
+    confrontando il contenuto, non il nome del file).
+    """
+    trovati = []
     for cartella in ("firmware", "."):
         if not os.path.isdir(cartella):
             continue
-        trovati = sorted(f for f in os.listdir(cartella) if f.endswith(".uf2"))
-        if trovati:
-            return os.path.join(cartella, trovati[-1])
-    return None
+        trovati += [os.path.join(cartella, f) for f in sorted(os.listdir(cartella))
+                    if f.endswith(".uf2")]
+    return trovati
+
+
+def verifica_uf2(percorsi):
+    """
+    Fra i .uf2 trovati, quello il cui SHA-256 corrisponde a UF2_ATTESO.
+    Rifiuta esplicitamente qualunque immagine sconosciuta o modificata:
+    non basta che UN file .uf2 sia presente, deve essere PROPRIO quello.
+    """
+    if not percorsi:
+        print("ERRORE: non trovo nessun file .uf2 di MicroPython.")
+        print("Scaricalo da micropython.org e mettilo in firmware/")
+        sys.exit(1)
+
+    for percorso in percorsi:
+        with open(percorso, "rb") as f:
+            impronta = hashlib.sha256(f.read()).hexdigest()
+        if impronta == UF2_ATTESO["sha256"]:
+            return percorso
+
+    print("ERRORE: nessuno dei file .uf2 trovati corrisponde alla release attesa.")
+    print("  attesa: %s" % UF2_ATTESO["nome"])
+    print("  SHA-256 atteso: %s" % UF2_ATTESO["sha256"])
+    print("\nTrovati:")
+    for percorso in percorsi:
+        with open(percorso, "rb") as f:
+            impronta = hashlib.sha256(f.read()).hexdigest()
+        print("  %-50s SHA-256 %s" % (percorso, impronta))
+    print("\nSe hai scaricato di proposito una versione nuova di MicroPython,")
+    print("controllane la provenienza e poi aggiorna UF2_ATTESO in questo file.")
+    sys.exit(1)
 
 
 def parole_da(digest):
@@ -114,11 +163,7 @@ def parole_da(digest):
 
 
 def main():
-    uf2 = trova_uf2()
-    if not uf2:
-        print("ERRORE: non trovo il file .uf2 di MicroPython.")
-        print("Scaricalo da micropython.org e mettilo in firmware/")
-        sys.exit(1)
+    uf2 = verifica_uf2(trova_uf2())
 
     mancanti = [f for f in FILE_DISPOSITIVO if not os.path.exists(f)]
     if mancanti:

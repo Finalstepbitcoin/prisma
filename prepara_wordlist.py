@@ -29,6 +29,18 @@ FONTI = [
 
 LARGHEZZA = 8   # la parola BIP39 piu' lunga e' di 8 lettere
 
+# Impronta del dizionario scaricato e verificato il 21 agosto 2026, quello
+# con cui e' stato costruito il dispositivo. Se una fonte restituisse un
+# contenuto diverso - fonte cambiata, o qualcosa in mezzo al download - lo
+# script si ferma qui sotto invece di generare firmware da un dizionario
+# diverso da quello atteso.
+#
+# Per aggiornarla DI PROPOSITO (es. viene corretto un refuso nel repository
+# BIP ufficiale): scarica il nuovo dizionario, controllane il contenuto a
+# mano confrontandolo con un'altra fonte indipendente, poi incolla qui il
+# nuovo SHA-256.
+IMPRONTA_ATTESA = "2f5eed53a4727b4bf8880d8f3f199efc90e58503646d9ff8eff3a2ed3b24dbda"
+
 
 def scarica():
     for url in FONTI:
@@ -128,6 +140,16 @@ def main():
     testo, url = scarica()
     impronta = hashlib.sha256(testo.encode("utf-8")).hexdigest()
     parole = testo.split()
+
+    if impronta != IMPRONTA_ATTESA:
+        print("\nERRORE: il dizionario scaricato NON corrisponde al valore atteso.")
+        print("  atteso : %s" % IMPRONTA_ATTESA)
+        print("  trovato: %s" % impronta)
+        print("\nPuo' essere una fonte cambiata (anche in modo legittimo) oppure")
+        print("qualcosa che si e' messo in mezzo al download. Non genero niente")
+        print("finche' non e' chiaro quale dei due casi sia: controlla il nuovo")
+        print("contenuto a mano prima di aggiornare IMPRONTA_ATTESA in questo file.")
+        sys.exit(1)
 
     print("\nControllo il dizionario...")
     errori = controlla(parole)

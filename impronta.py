@@ -5,17 +5,21 @@ L'impronta del firmware, mostrata all'accensione come tre parole BIP39.
 
 A COSA SERVE
 Confrontare le tre parole con quelle pubblicate sul sito e stampate sul
-foglietto nella scatola. Se coincidono, il contenuto del dispositivo e'
-quello previsto: nessuno l'ha toccato fra la consegna e le tue mani.
+foglietto nella scatola. Se coincidono, il contenuto del dispositivo
+corrisponde a quello atteso.
 
 A COSA *NON* SERVE, E VA DETTO CHIARO
-Non e' una prova. Un firmware malevolo mostrerebbe semplicemente le tre
-parole giuste: il programma che si controlla da solo e' contemporaneamente
-l'imputato e il perito. La verifica vera si fa da spenti, con picotool, ed
-e' descritta nella guida.
-Questa impronta vale contro le manomissioni AVVENUTE DOPO la consegna
-(corriere, magazzino, rivenditore) e contro il deterioramento della memoria.
-Non vale come garanzia su chi ha costruito il dispositivo.
+Non e' una prova contro manomissioni volute. Un firmware malevolo
+mostrerebbe semplicemente le tre parole giuste: il programma che si
+controlla da solo e' contemporaneamente l'imputato e il perito. Questo vale
+allo stesso modo per chi ha costruito il dispositivo E per chi lo avesse
+manomesso dopo (corriere, magazzino, rivenditore): in entrambi i casi
+l'attaccante controlla lo stesso codice che calcola questo valore.
+Questa impronta vale SOLO contro il deterioramento accidentale della
+memoria, non contro una manomissione deliberata di nessun tipo.
+La verifica vera si fa da spenti: con picotool, che legge dal bootloader in
+ROM e non dal firmware, oppure riflashando tu stesso il .uf2 ufficiale.
+Entrambe sono descritte nella guida.
 
 COSA VIENE MISURATO
   1. mezzo megabyte di memoria flash a partire dall'inizio: e' li' che sta

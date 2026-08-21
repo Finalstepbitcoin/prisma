@@ -156,10 +156,22 @@ dispositivo c'e' esattamente quello che c'e' in questo repository.
 
 Basta aggiungere un file perche' cambino: e' proprio quello che devono fare.
 
-**Attenzione a cosa dimostra**: vale contro le manomissioni avvenute *dopo* la
-consegna. Non dimostra niente su chi ha costruito il dispositivo, perche' un
-firmware malevolo mostrerebbe le parole giuste. Per quello servono `picotool`
-o il riflash — vedi la guida.
+**Attenzione a cosa dimostra, e cosa NON dimostra**: e' il firmware stesso a
+calcolare e mostrare queste tre parole. Un firmware malevolo mostrerebbe
+comunque le parole giuste — sia che la manomissione sia avvenuta durante la
+costruzione, sia durante il trasporto, in magazzino o presso un rivenditore:
+in tutti questi casi chi manomette il dispositivo controlla lo stesso codice
+che calcola l'impronta, e puo' farla tornare giusta a piacere.
+
+Questo controllo serve solo contro il deterioramento accidentale della
+memoria (un bit corrotto, un file mancante), **non contro una manomissione
+voluta, di nessun tipo**. Per una prova vera serve leggere il contenuto da
+SPENTI, con un canale che il firmware non controlla:
+
+- `picotool save -a` / `picotool verify` da BOOTSEL, che risponde il
+  bootloader in ROM col firmware fermo — vedi la guida
+- oppure riflashare tu stesso il `.uf2` ufficiale, che sostituisce
+  qualunque cosa ci fosse prima
 
 ---
 
