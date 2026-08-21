@@ -31,25 +31,38 @@ FILE_DISPOSITIVO = (
 
 
 def main():
-    print("Installo %d file sul dispositivo.\n" % len(FILE_DISPOSITIVO))
+    print("Preparo %d file sul dispositivo: li copia e ne verifica il" % len(FILE_DISPOSITIVO))
+    print("contenuto, ma non sostituisce ancora nessun file attivo.\n")
     for nome in FILE_DISPOSITIVO:
-        esito = subprocess.run([sys.executable, "parla_col_pico.py", "copia", nome],
+        esito = subprocess.run([sys.executable, "parla_col_pico.py", "prepara", nome],
                                capture_output=True, text=True)
         if esito.returncode != 0:
-            print("ERRORE copiando %s:" % nome)
+            print("ERRORE preparando %s:" % nome)
             print(esito.stdout, esito.stderr)
-            print("\nL'installazione si e' fermata qui. Ogni file copiato finora")
-            print("e' stato sostituito solo dopo essere stato verificato byte per")
-            print("byte, quindi nessuno di quelli e' a meta' o corrotto - ma i file")
-            print("successivi a questo nell'elenco sono rimasti alla versione")
-            print("precedente. Risolvi il problema e rilancia python3 installa.py:")
-            print("ripetere e' innocuo, ricopia solo quello che manca o e' diverso.")
+            print("\nNessun file attivo sul dispositivo e' stato toccato: sta ancora")
+            print("girando esattamente la versione precedente. Risolvi il problema")
+            print("e rilancia python3 installa.py.")
             return 1
-        ultima = [r for r in esito.stdout.splitlines() if "Copiato" in r]
+        ultima = [r for r in esito.stdout.splitlines() if "Verificato" in r]
         print("  %-20s %s" % (nome, ultima[0] if ultima else "ok"))
 
+    print("\nTutti i file sono pronti e verificati. Attivazione (un'operazione")
+    print("di filesystem, non un trasferimento: dura una frazione di secondo")
+    print("per tutti i file insieme)...")
+    esito = subprocess.run([sys.executable, "parla_col_pico.py", "attiva"]
+                           + list(FILE_DISPOSITIVO),
+                           capture_output=True, text=True)
+    if esito.returncode != 0:
+        print("ERRORE nell'attivazione:")
+        print(esito.stdout, esito.stderr)
+        print("\nAlcuni file potrebbero essere stati sostituiti e altri no.")
+        print("Rilancia SUBITO python3 installa.py per completare: e' sicuro,")
+        print("rifara' solo i passaggi mancanti, non danneggia nulla.")
+        return 1
+    print("  " + esito.stdout.strip())
+
     print("\nVerifica finale: ogni file installato corrisponde davvero a")
-    print("quello sul computer? (prova contenuto per contenuto, non solo che")
+    print("quello sul computer? (contenuto per contenuto, non solo che")
     print("qualcosa con quel nome esista)")
     problemi = 0
     for nome in FILE_DISPOSITIVO:
@@ -64,19 +77,28 @@ def main():
         print("python3 installa.py per completare, non e' un'operazione distruttiva.")
         return 1
 
-    print("\nControllo che non siano rimasti file .py non previsti (residui di")
-    print("un'installazione precedente, che cambierebbero l'impronta)...")
+    print("\nControllo che non siano rimasti file non previsti sul dispositivo...")
     presenti = elenco_dispositivo()
     if presenti is None:
         return 1
     attesi = set(FILE_DISPOSITIVO)
     estranei = sorted(n for n in presenti if n.endswith(".py") and n not in attesi)
+    residui = sorted(n for n in presenti if n.endswith(".tmp"))
     if estranei:
         print("\nATTENZIONE: sul dispositivo ci sono file .py non previsti:")
         for n in estranei:
             print("  - %s" % n)
-        print("Rimuovili a mano prima di calcolare l'impronta finale.")
-    else:
+        print("Potrebbero cambiare l'impronta del firmware. Rimuovili a mano.")
+    if residui:
+        print("\nATTENZIONE: residui di una preparazione mai completata (una")
+        print("copia interrotta prima di questa installazione):")
+        for n in residui:
+            print("  - %s" % n)
+        print("Innocui - non vengono ne' eseguiti ne' contati nell'impronta - ma")
+        print("meglio ripulirli, per esempio con:")
+        for n in residui:
+            print("    python3 parla_col_pico.py esegui \"import os; os.remove(%r)\"" % n)
+    if not estranei and not residui:
         print("  nessun file estraneo.")
 
     print("\nFatto: %d file installati e verificati. Stacca e riattacca il cavo,"

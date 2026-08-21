@@ -691,6 +691,11 @@ class Interfaccia:
             parole.append(p)
 
             abbastanza = len(parole) >= dw.CONSIGLIATE
+            # al massimo, "A) piu" premere A chiuderebbe comunque la
+            # sessione (il controllo all'inizio del ciclo lo impedisce): il
+            # tasto va rietichettato, non lasciato a promettere un'undicesima
+            # parola che non arriva mai
+            al_massimo = len(parole) >= dw.MASSIMO_PAROLE
             self.sc.pulisci(s.NERO)
             self._centrata(cifre, 18, s.GRIGIO, 2)
             self._centrata(p, 64, s.VERDE, 3)
@@ -699,7 +704,7 @@ class Interfaccia:
             self._centrata("%d parole" % len(parole), 136, s.BIANCO, 2)
             self._centrata("%s bit" % dw.bit_testo(len(parole)), 166,
                            s.ARANCIO if abbastanza else s.GIALLO, 2)
-            self._piede("A) piu", "Y) fine")
+            self._piede("A) fine" if al_massimo else "A) piu", "Y) fine")
             self.sc.mostra()
 
             t = self.cm.attendi()
@@ -834,9 +839,16 @@ class Interfaccia:
         self.sc.mostra()
 
         bip39.lettere_possibili("")     # prepara la ricerca, costa un secondo
+        tre = None
+        guasto_memoria = False
         try:
             import impronta
             tre = impronta.parole()
+        except MemoryError:
+            # distinto dagli altri errori apposta: qui c'e' un rimedio
+            # preciso da suggerire (come gia' fa modalita_diceware), non
+            # solo un generico "non disponibile" che non dice cosa fare
+            guasto_memoria = True
         except Exception:
             tre = None
 
@@ -852,6 +864,9 @@ class Interfaccia:
             for p in tre:
                 self._centrata(p.upper(), y, s.VERDE, 2)
                 y += 24
+        elif guasto_memoria:
+            self._centrata("memoria piena", 100, s.GIALLO, 1)
+            self._centrata("spegni e riaccendi", 124, s.GIALLO, 1)
         else:
             self._centrata("impronta", 100, s.GRIGIO, 1)
             self._centrata("non disponibile", 124, s.GIALLO, 1)

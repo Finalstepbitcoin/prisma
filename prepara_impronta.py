@@ -119,7 +119,7 @@ def trova_uf2():
         if not os.path.isdir(cartella):
             continue
         trovati += [os.path.join(cartella, f) for f in sorted(os.listdir(cartella))
-                    if f.endswith(".uf2")]
+                    if f.lower().endswith(".uf2")]
     return trovati
 
 

@@ -17,6 +17,12 @@ Uso:
     python3 parla_col_pico.py verifica bip39_checksum.py
     python3 parla_col_pico.py elenco
 
+    python3 parla_col_pico.py prepara bip39_checksum.py    (copia SENZA attivare)
+    python3 parla_col_pico.py attiva bip39_checksum.py main.py ...   (attiva in blocco)
+    Usati da installa.py per installare piu' file con un'unica finestra
+    di rischio breve invece che una per file: vedi comando_prepara e
+    comando_attiva qui sotto.
+
 Come funziona: MicroPython espone una "REPL grezza" (raw REPL), un canale
 pensato apposta per essere pilotato da un programma invece che da una persona.
 Si entra con CTRL-A, si manda il codice, si esegue con CTRL-D.
@@ -169,19 +175,20 @@ def _cancella_su_scheda(pico, nome):
     pico.esegui("import os\ntry:\n    os.remove(%r)\nexcept OSError:\n    pass\n" % nome)
 
 
-def comando_copia(pico, percorso):
+def _trasferisci_e_verifica(pico, percorso):
     """
-    Copia con un file temporaneo + verifica del CONTENUTO + scambio finale.
+    Scrive il contenuto sotto nome temporaneo e ne verifica il CONTENUTO
+    (non solo la dimensione: un pezzo corrotto in trasmissione puo' dare
+    un file della lunghezza giusta ma sbagliato) confrontando l'hash
+    calcolato sulla scheda con quello del file sul Mac.
 
-    Perche' non basta scrivere direttamente sul nome vero: se il cavo si
-    stacca o il trasferimento si interrompe a meta', il file di destinazione
-    resterebbe troncato. Scrivendo su un nome temporaneo e spostandolo sopra
-    solo DOPO che il contenuto e' stato verificato byte per byte, un
-    trasferimento interrotto lascia intatta l'ultima versione buona.
+    NON sostituisce ancora il file vero: quello lo fa _codice_scambio(),
+    chiamato da chi usa questa funzione. Tenerli separati e' cio' che
+    permette a installa.py di preparare e verificare TUTTI i file prima
+    di toccarne anche uno solo di quelli attivi (vedi comando_attiva).
 
-    E perche' l'hash e non solo la dimensione: due file della stessa
-    lunghezza possono avere contenuto diverso (un pezzo corrotto in
-    trasmissione, per esempio). Solo un confronto del contenuto lo rileva.
+    Restituisce (0, nome, temporaneo) se e' andato tutto bene,
+    (1, None, None) altrimenti.
     """
     nome = os.path.basename(percorso)
     temporaneo = "." + nome + ".tmp"
@@ -193,7 +200,7 @@ def comando_copia(pico, percorso):
     uscita, errore = pico.esegui("f = open(%r, 'wb')\n" % temporaneo)
     if errore.strip():
         print(errore)
-        return 1
+        return 1, None, None
 
     PEZZO = 512
     inviati = 0
@@ -204,14 +211,12 @@ def comando_copia(pico, percorso):
             print("\nERRORE durante la scrittura:", errore.strip())
             pico.esegui("f.close()\n")
             _cancella_su_scheda(pico, temporaneo)
-            return 1
+            return 1, None, None
         inviati += len(blocco)
         print("\r  %d%%" % (100 * inviati // len(dati)), end="", flush=True)
     print()
     pico.esegui("f.close()\n")
 
-    # confronto del CONTENUTO, calcolato sulla scheda: non solo la
-    # dimensione, che una corruzione a parita' di byte non rileverebbe
     codice_hash = (
         "import hashlib\n"
         "h = hashlib.sha256()\n"
@@ -227,32 +232,101 @@ def comando_copia(pico, percorso):
     if errore.strip():
         print("ERRORE calcolando l'impronta sulla scheda:", errore.strip())
         _cancella_su_scheda(pico, temporaneo)
-        return 1
+        return 1, None, None
     impronta_scheda = uscita.strip()
     if impronta_scheda != impronta_attesa:
         print("ERRORE: impronta diversa dopo la copia.")
         print("  atteso : %s" % impronta_attesa)
         print("  scheda : %s" % impronta_scheda)
         _cancella_su_scheda(pico, temporaneo)
-        return 1
+        return 1, None, None
 
-    # solo ORA, con contenuto verificato, si sostituisce il file vero: se
-    # la corrente si interrompe qui, nel peggiore dei casi resta il file
-    # temporaneo (gia' valido) accanto a quello vecchio, mai un file a meta'
-    codice_scambio = (
-        "import os\n"
+    print("Verificato: %d byte, SHA-256 %s..." % (len(dati), impronta_attesa[:12]))
+    return 0, nome, temporaneo
+
+
+def _codice_scambio(nome, temporaneo):
+    """
+    Il codice che sostituisce UN file col suo temporaneo gia' verificato.
+
+    Prova PRIMA un rename diretto: su questo filesystem (littlefs) sostituisce
+    da solo un file gia' esistente, senza bisogno di cancellarlo prima -
+    quindi non c'e' mai un istante in cui il nome vero non esiste. Ricorre
+    al remove-poi-rename SOLO se il rename diretto fallisse (per esempio su
+    un filesystem che non lo permette): in quel caso, e solo in quel caso,
+    c'e' una finestra minima e inevitabile fra le due operazioni.
+    """
+    return (
         "try:\n"
-        "    os.remove(%r)\n"
+        "    os.rename(%r, %r)\n"
         "except OSError:\n"
-        "    pass\n"
-        "os.rename(%r, %r)\n"
-    ) % (nome, temporaneo, nome)
-    uscita, errore = pico.esegui(codice_scambio)
+        "    try:\n"
+        "        os.remove(%r)\n"
+        "    except OSError:\n"
+        "        pass\n"
+        "    os.rename(%r, %r)\n"
+    ) % (temporaneo, nome, nome, temporaneo, nome)
+
+
+def comando_copia(pico, percorso):
+    """Copia un file e lo attiva subito. Per uso interattivo da terminale;
+    installa.py usa invece prepara+attiva per installare piu' file insieme
+    (vedi comando_prepara e comando_attiva)."""
+    esito, nome, temporaneo = _trasferisci_e_verifica(pico, percorso)
+    if esito != 0:
+        return 1
+    codice = "import os\n" + _codice_scambio(nome, temporaneo)
+    uscita, errore = pico.esegui(codice)
     if errore.strip():
         print("ERRORE sostituendo il file:", errore.strip())
         return 1
+    print("Copiato: %s" % nome)
+    return 0
 
-    print("Copiato e verificato: %d byte, SHA-256 %s..." % (len(dati), impronta_attesa[:12]))
+
+def comando_prepara(pico, percorso):
+    """
+    Copia e verifica un file SENZA attivarlo: resta sotto nome temporaneo.
+
+    Usato da installa.py per preparare e verificare TUTTI i file prima di
+    sostituire anche uno solo di quelli in uso: cosi' un'interruzione
+    durante questa fase (che e' quella lunga, un trasferimento dati) non
+    tocca nessun file attivo sul dispositivo. Vedi comando_attiva.
+    """
+    esito, _, _ = _trasferisci_e_verifica(pico, percorso)
+    return esito
+
+
+def comando_attiva(pico, nomi):
+    """
+    Sostituisce, IN UN SOLO COMANDO mandato alla scheda, ogni file vero
+    con la sua versione temporanea gia' preparata da 'prepara'.
+
+    E' un'operazione di filesystem (rinominare dei file), non un
+    trasferimento dati: per tutti i file insieme dura una frazione di
+    secondo, non secondi per ognuno come la copia. E' questo che riduce al
+    minimo la finestra in cui staccare il cavo a meta' potrebbe lasciare
+    una mescolanza di file vecchi e nuovi.
+
+    ONESTA': non puo' azzerarla del tutto. Lo stesso cavo che porta i dati
+    alimenta anche il dispositivo: se salta in quel preciso istante, il
+    codice si ferma esattamente dov'e', e non c'e' modo di evitarlo via
+    software. Quello che si puo' fare - e che questa funzione fa - e'
+    rendere quell'istante il piu' breve possibile, e rendere il rilancio
+    di installa.py dopo un'interruzione sempre sicuro (rifa' solo quello
+    che manca, non danneggia quello che c'e' gia').
+    """
+    righe = ["import os"]
+    for nome in nomi:
+        temporaneo = "." + nome + ".tmp"
+        righe.append(_codice_scambio(nome, temporaneo))
+    righe.append("print('attivati %d file')" % len(nomi))
+    codice = "\n".join(righe) + "\n"
+    uscita, errore = pico.esegui(codice)
+    if errore.strip():
+        print("ERRORE nell'attivazione:", errore.strip())
+        return 1
+    print(uscita.strip())
     return 0
 
 
@@ -326,6 +400,10 @@ def main():
             return comando_copia(pico, sys.argv[2])
         if cmd == "verifica":
             return comando_verifica(pico, sys.argv[2])
+        if cmd == "prepara":
+            return comando_prepara(pico, sys.argv[2])
+        if cmd == "attiva":
+            return comando_attiva(pico, sys.argv[2:])
         if cmd == "lancia":
             # avvia del codice che NON finisce (tipo l'interfaccia) e lascia
             # la scheda a girare per conto suo, senza aspettare la fine

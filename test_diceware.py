@@ -70,6 +70,12 @@ def test_lista(codice, dati):
              "la fonte %s non corrisponde piu' all'impronta pinnata "
              "(atteso %s, trovato %s)"
              % (dati["nome"], dati["impronta_attesa"], impronta))
+    if impronta != dati["impronta_attesa"]:
+        # la fonte e' cambiata: confrontare voce per voce col dispositivo
+        # non direbbe niente di utile in piu', solo altri errori a catena
+        # con la stessa causa. Meglio fermarsi qui ed essere chiari.
+        print("  fonte diversa dal valore pinnato: salto i controlli restanti")
+        return
 
     vere = dict(re.findall(r"^([1-6]{5})[ \t]+(\S+)[ \t]*$", testo, re.M))
     verifica(len(vere) == ATTESE, "la fonte non ha %d voci" % ATTESE)

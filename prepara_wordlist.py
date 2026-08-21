@@ -43,15 +43,40 @@ IMPRONTA_ATTESA = "2f5eed53a4727b4bf8880d8f3f199efc90e58503646d9ff8eff3a2ed3b24d
 
 
 def scarica():
+    """
+    Interroga TUTTE le fonti raggiungibili, non si ferma alla prima che
+    risponde: se sono d'accordo fra loro e' un controllo in piu' (una fonte
+    compromessa o un mirror indietro di un aggiornamento verrebbe scoperto
+    dal confronto), se non lo sono lo script si ferma invece di scegliere
+    a caso quale credere.
+    """
+    risultati = []
     for url in FONTI:
         try:
             print("Scarico da: %s" % url)
             with urllib.request.urlopen(url, timeout=30) as r:
-                return r.read().decode("utf-8"), url
+                testo = r.read().decode("utf-8")
+            risultati.append((url, testo))
         except Exception as e:
             print("   non riuscito (%s)" % e)
-    print("\nERRORE: nessuna fonte raggiungibile. Sei collegato a internet?")
-    sys.exit(1)
+
+    if not risultati:
+        print("\nERRORE: nessuna fonte raggiungibile. Sei collegato a internet?")
+        sys.exit(1)
+
+    if len(risultati) > 1:
+        impronte = {hashlib.sha256(t.encode("utf-8")).hexdigest() for _, t in risultati}
+        if len(impronte) > 1:
+            print("\nERRORE: le fonti raggiunte NON sono d'accordo fra loro:")
+            for url, t in risultati:
+                print("  %s" % url)
+                print("    SHA-256: %s" % hashlib.sha256(t.encode("utf-8")).hexdigest())
+            print("Non genero niente finche' non e' chiaro quale sia quella giusta.")
+            sys.exit(1)
+        print("Le %d fonti raggiunte sono d'accordo fra loro." % len(risultati))
+
+    url_prima, testo_primo = risultati[0]
+    return testo_primo, url_prima
 
 
 def controlla(parole):
