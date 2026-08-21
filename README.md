@@ -118,7 +118,7 @@ esattamente i risultati previsti dallo standard — non "sembra funzionare", ma
 
 ```
 python3 test_bip39.py      →  186 controlli
-python3 test_diceware.py   →   30 controlli
+python3 test_diceware.py   →   32 controlli
 ```
 
 E sul dispositivo, una prova che ripercorre da sola ogni schermata e ogni
@@ -128,7 +128,7 @@ avvisi — controllando che nessuna finisca in errore:
 ```
 python3 parla_col_pico.py copia prova_percorsi.py
 python3 parla_col_pico.py esegui --pulito "import prova_percorsi"
-                           →  15 percorsi
+                           →  17 percorsi
 ```
 
 **Ricordati di togliere `prova_percorsi.py` dal dispositivo quando hai
