@@ -88,32 +88,54 @@ def esegui():
 
     zero, uno = valide[0], valide[127]
 
+    # Dopo l'ultima parola inserita c'e' ora rivedi_parole (l'elenco da
+    # ricontrollare prima del calcolo): un "A" in piu' per accettarlo alla
+    # prima pagina, prima di proseguire come prima verso l'ultima parola.
+    RIVEDI_ACCETTA = ["A"]
+
     def seed_bit():
-        con_tasti(i, ["A", "A"] + parole_seed + ["A"] + ["Y"] * 7 + ["A"])
+        con_tasti(i, ["A", "A"] + parole_seed + RIVEDI_ACCETTA + ["A"] + ["Y"] * 7 + ["A"])
         i.modalita_seed()
     prova("seed 12 parole, bit tutti a zero -> %s" % zero, seed_bit)
 
     def seed_uni():
-        con_tasti(i, ["A", "A"] + parole_seed + ["A"] + ["X"] * 7 + ["A"])
+        con_tasti(i, ["A", "A"] + parole_seed + RIVEDI_ACCETTA + ["A"] + ["X"] * 7 + ["A"])
         i.modalita_seed()
     prova("seed 12 parole, bit tutti a uno -> %s" % uno, seed_uni)
 
     def seed_zeri():
-        con_tasti(i, ["A", "A"] + parole_seed + ["giu", "giu", "A", "A"])
+        con_tasti(i, ["A", "A"] + parole_seed + RIVEDI_ACCETTA
+                  + ["giu", "giu", "A", "A"])
         i.modalita_seed()
     prova("seed 12 parole, voce 'tutti zeri'", seed_zeri)
 
     def seed_elenco():
-        con_tasti(i, ["A", "A"] + parole_seed + ["giu", "A"] + ["giu"] * 3 + ["A", "A"])
+        con_tasti(i, ["A", "A"] + parole_seed + RIVEDI_ACCETTA
+                  + ["giu", "A"] + ["giu"] * 3 + ["A", "A"])
         i.modalita_seed()
     prova("seed 12 parole, scelta dall'elenco", seed_elenco)
 
     def seed_cancella():
-        # inserisce due parole, torna indietro con B, le rifa
+        # inserisce due parole, torna indietro con B, le rifa. Non arriva
+        # mai a rivedi_parole (esce da modalita_seed prima, quando l'ultimo
+        # B svuota l'elenco): nessun tasto in piu' da aggiungere qui.
         due = tasti_per_parola(i, FRASE[0]) + tasti_per_parola(i, FRASE[1])
         con_tasti(i, ["A", "A"] + due + ["B", "B", "B", "B", "B", "B", "B", "B"])
         i.modalita_seed()
     prova("seed, ritorno indietro con B fino a uscire", seed_cancella)
+
+    def seed_rivedi_due_pagine():
+        """rivedi_parole con 11 parole sta su due pagine (10+1): qui si va
+        alla seconda con la freccia, si rifiuta con B) rifai, si rifa'
+        tutto l'inserimento e stavolta si accetta - la stessa distinzione
+        gia' provata per Diceware (dadi_annulla, dadi_due_schermate), qui
+        per il flusso del seed."""
+        seq = (["A", "A"] + parole_seed + ["destra", "B"]
+               + ["A"] + parole_seed + ["A"]
+               + ["giu", "giu", "A", "A"])
+        con_tasti(i, seq)
+        i.modalita_seed()
+    prova("seed, revisione parole: pagina 2 poi rifai", seed_rivedi_due_pagine)
 
     print("\nSINGOLE SCHERMATE")
 

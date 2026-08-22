@@ -452,6 +452,56 @@ class Interfaccia:
     # modalita' completa
     # ------------------------------------------------------------------
 
+    def rivedi_parole(self, parole):
+        """
+        Elenco numerato delle parole appena inserite, PRIMA di calcolare
+        il checksum.
+
+        E' l'unico momento in cui ci si puo' accorgere di aver scelto la
+        parola sbagliata dall'autocompletamento: qualunque parola esista
+        nel dizionario BIP39 produce comunque 128 (o 8) candidate valide,
+        senza nessun errore - il calcolo non puo' distinguere "la parola
+        giusta" da "una parola del dizionario, ma quella sbagliata". Senza
+        questa schermata, un errore di selezione passa inosservato fino
+        alla fine, e il seed completato e' semplicemente diverso da quello
+        vero, senza nessun avviso.
+
+        Restituisce True per procedere, False per rifare l'inserimento
+        da capo (il tasto "B) rifai" - qui non si corregge una parola
+        sola, si ricomincia tutto: piu' semplice da scrivere e da capire,
+        a costo di dover ridigitare anche le parole gia' giuste).
+        """
+        n_pagine = (len(parole) + 9) // 10
+        pagina = 0
+        while True:
+            self._intestazione("CONTROLLA LE PAROLE")
+            inizio = pagina * 10
+            y = 38
+            for i, p in enumerate(parole[inizio:inizio + 10], start=inizio):
+                self.sc.scritta("%2d" % (i + 1), 8, y, s.GRIGIO, 1)
+                self.sc.scritta(p, 34, y, s.BIANCO, 1)
+                y += 16
+
+            # stesso principio delle frecce di mostra_passphrase: nel
+            # margine vuoto ai lati delle righe, non sopra
+            if n_pagine > 1 and pagina > 0:
+                self.sc.scritta("<", 0, 100, s.ARANCIO, 1)
+            if n_pagine > 1 and pagina < n_pagine - 1:
+                self.sc.scritta(">", 230, 100, s.ARANCIO, 1)
+
+            self._piede("A) avanti", "B) rifai")
+            self.sc.mostra()
+
+            t = self.cm.attendi()
+            if t in ("A", "centro"):
+                return True
+            if t == "B":
+                return False
+            if n_pagine > 1 and t == "destra" and pagina < n_pagine - 1:
+                pagina += 1
+            elif n_pagine > 1 and t == "sinistra" and pagina > 0:
+                pagina -= 1
+
     def modalita_seed(self):
         scelta = self.menu("QUANTE PAROLE", ["12 parole", "24 parole"])
         if scelta is None:
@@ -460,17 +510,22 @@ class Interfaccia:
         da_inserire = DA_INSERIRE[totale]
         bit_liberi = BIT_LIBERI[totale]
 
-        self._messaggio(["INSERISCI", "LE PRIME", "%d PAROLE" % da_inserire])
+        while True:
+            self._messaggio(["INSERISCI", "LE PRIME", "%d PAROLE" % da_inserire])
 
-        parole = []
-        while len(parole) < da_inserire:
-            p = self.chiedi_parola(len(parole) + 1, da_inserire)
-            if p is None:
-                if parole:
-                    parole.pop()
-                    continue
-                return
-            parole.append(p)
+            parole = []
+            while len(parole) < da_inserire:
+                p = self.chiedi_parola(len(parole) + 1, da_inserire)
+                if p is None:
+                    if parole:
+                        parole.pop()
+                        continue
+                    return
+                parole.append(p)
+
+            if self.rivedi_parole(parole):
+                break
+            bip39.dimentica(parole)
 
         gc.collect()
         self._barra(0)

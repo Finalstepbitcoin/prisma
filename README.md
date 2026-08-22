@@ -128,7 +128,7 @@ avvisi — controllando che nessuna finisca in errore:
 ```
 python3 parla_col_pico.py copia prova_percorsi.py
 python3 parla_col_pico.py esegui --pulito "import prova_percorsi"
-                           →  17 percorsi
+                           →  18 percorsi
 ```
 
 **Ricordati di togliere `prova_percorsi.py` dal dispositivo quando hai

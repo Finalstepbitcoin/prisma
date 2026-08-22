@@ -44,7 +44,7 @@
 
   /* ---------- passi numerati ---------- */
   .passi { counter-reset:passo; margin-top:1mm; }
-  .passi .p { display:flex; gap:3mm; padding:1.1mm 0; border-top:1px solid #e4e4e4; }
+  .passi .p { display:flex; gap:3mm; padding:0.7mm 0; border-top:1px solid #e4e4e4; }
   .passi .p:first-child { border-top:none; }
   .passi .p::before { counter-increment:passo; content:counter(passo);
                       font-family:"Menlo",monospace; font-weight:700; font-size:9.5pt;
@@ -186,7 +186,8 @@
   <div class="passi">
     <div class="p"><div class="t"><span class="cap">Menu &rarr; Checksum.</span> Scegli se il tuo seed &egrave; da <b>12</b> o da <b>24</b> parole.</div></div>
     <div class="p"><div class="t"><span class="cap">Inserisci le prime 11 parole</span> (o 23). Per ogni parola compare la griglia delle <b>sole lettere ancora possibili</b>: il joystick si muove, A conferma. Quando restano cinque parole o meno te le mostra e scegli quella giusta.
-      <span class="nota">B cancella una lettera. Se la casella &egrave; gi&agrave; vuota, torni alla parola precedente.</span></div></div>
+      <span class="nota">B cancella una lettera; a casella vuota, torna alla parola precedente.<br>
+      Poi un elenco le riepiloga tutte: <b>controllale</b>, un errore qui non darebbe avviso.</span></div></div>
     <div class="p"><div class="t"><span class="cap">Aspetta il calcolo.</span> Con 11 parole ci mette circa 3 secondi e mezzo, con 23 circa 6: la barra arancione mostra a che punto &egrave;.</div></div>
     <div class="p"><div class="t"><span class="cap">Scegli come completare.</span> Il dispositivo propone tre strade:
       <span class="nota"><b>Bit rimasti</b> &mdash; quella giusta: inserisci i <b>7 bit</b> che ti avanzano dai dadi (3 se il seed &egrave; da 24), <b>nell&rsquo;ordine in cui li hai generati</b>. X vale 1, Y vale 0.<br>
@@ -218,7 +219,7 @@
     <div class="p"><div class="t"><span class="cap">Guarda i bit che stai accumulando.</span> Dopo ogni parola: <b>A</b> per farne un&rsquo;altra, <b>Y</b> per fermarti. Sotto le <b>6 parole</b> il dispositivo ti avvisa ogni volta; il massimo &egrave; <b>20</b> (258,5 bit), in due schermate da dieci.</div></div>
     <div class="p"><div class="t"><span class="cap">Se compare &ldquo;copiala esatta!&rdquo;</span> la voce contiene simboli o cifre &mdash; per esempio <span class="mono">a</span>, <span class="mono">@</span>, <span class="mono">i&rsquo;ve</span>, <span class="mono">12</span>. Sono legittime e vanno copiate <b>esattamente cos&igrave;</b>.</div></div>
     <div class="p"><div class="t"><span class="cap">Copia tutte e due le schermate finali</span> &mdash; prima l&rsquo;elenco numerato, poi la passphrase per intero &mdash; <b>sullo stesso foglio</b>. Poi stacca il cavo.
-      <span class="nota">Con piu' di 10 parole l&rsquo;elenco numerato sta su due schermate, con una freccia per passare alla seconda: copiale entrambe.</span></div></div>
+      <span class="nota">Con pi&ugrave; di 10 parole l&rsquo;elenco numerato sta su due schermate, con una freccia per passare alla seconda: copiale entrambe.</span></div></div>
   </div>
 
   <div class="riga" style="margin-top:2.5mm">
