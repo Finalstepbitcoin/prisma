@@ -208,6 +208,17 @@ revisionato da terzi. Trattalo di conseguenza.
 
 ---
 
+## Le schede di carta
+
+Gli stessi calcoli si possono fare **senza nessun dispositivo**, a matita, con
+le due schede stampabili: la tabella BIP39 da binario a mnemonica e la scheda
+Diceware dai dadi alle parole. Stanno in un repository a parte, perché si
+usano da sole e non dipendono da Sintesi:
+
+**[Finalstepbitcoin/schede-carta](https://github.com/Finalstepbitcoin/schede-carta)**
+
+---
+
 ## Licenze
 
 Il codice di questo progetto è sotto licenza **MIT** (vedi `LICENSE`).
