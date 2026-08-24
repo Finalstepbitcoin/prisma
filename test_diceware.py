@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-test_diceware.py  --  Final Step Bitcoin / Checksum Tool
+test_diceware.py  --  Final Step Bitcoin / Sintesi
 
 Verifica che la traduzione dai dadi alle parole sia corretta, confrontandola
 con le liste ufficiali riscaricate dalle fonti.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-prepara_qr.py  --  Final Step Bitcoin / Checksum Tool
+prepara_qr.py  --  Final Step Bitcoin / Sintesi
 
 Disegna il codice QR del canale YouTube e lo salva come immagine gia' pronta
 in  qr_canale.py .

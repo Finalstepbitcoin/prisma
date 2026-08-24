@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-prepara_diceware.py  --  Final Step Bitcoin / Checksum Tool
+prepara_diceware.py  --  Final Step Bitcoin / Sintesi
 
 Scarica le due liste Diceware pubblicate sul sito e le trasforma nei file
 che il dispositivo puo' leggere.

@@ -1,5 +1,5 @@
 """
-main.py  --  Final Step Bitcoin / Checksum Tool
+main.py  --  Final Step Bitcoin / Sintesi
 
 MicroPython esegue questo file DA SOLO a ogni accensione.
 

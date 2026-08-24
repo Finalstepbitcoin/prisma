@@ -1,5 +1,5 @@
 """
-interfaccia.py  --  Final Step Bitcoin / Checksum Tool
+interfaccia.py  --  Final Step Bitcoin / Sintesi
 
 L'interfaccia sullo schermo: menu, inserimento delle parole con
 autocompletamento, scelta dell'ultima parola.
@@ -940,7 +940,7 @@ class Interfaccia:
 
         self.sc.hline(20, 172, 200, s.colore(60, 60, 60))
         self._centrata("il tuo generatore offline", 180, s.BIANCO, 1)
-        self._centrata("Checksum Tool " + VERSIONE, 194, s.GRIGIO, 1)
+        self._centrata("Sintesi " + VERSIONE, 194, s.GRIGIO, 1)
         self._piede("A) avanti")
         self.sc.mostra()
         while self.cm.attendi() not in ("A", "centro"):
@@ -960,7 +960,7 @@ class Interfaccia:
             elif scelta == 1:
                 self.modalita_diceware()
             elif scelta == 2:
-                self._messaggio(["Checksum Tool", VERSIONE,
+                self._messaggio(["Sintesi", VERSIONE,
                                  "finalstep", "bitcoin.com"], s.BIANCO)
 
 

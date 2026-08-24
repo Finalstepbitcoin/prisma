@@ -1,5 +1,5 @@
 """
-schermo.py  --  Final Step Bitcoin / Checksum Tool
+schermo.py  --  Final Step Bitcoin / Sintesi
 
 Driver dello schermo Waveshare Pico-LCD-1.3 (240x240, chip ST7789)
 e lettura del joystick e dei quattro pulsanti.

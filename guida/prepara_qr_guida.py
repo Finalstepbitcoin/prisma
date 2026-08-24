@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-prepara_qr_guida.py  --  Final Step Bitcoin / Checksum Tool
+prepara_qr_guida.py  --  Final Step Bitcoin / Sintesi
 
 Disegna il codice QR stampato sulla guida (facciata 2, riquadro della
 verifica del firmware) e lo salva come immagine SVG gia' pronta in
@@ -35,7 +35,7 @@ except ImportError:
 
 # L'UNICO punto da cambiare se l'indirizzo della pagina cambia. Ricordati
 # di aggiornare anche la scritta sotto il QR dentro sorgente.html.
-INDIRIZZO = "https://www.finalstepbitcoin.com/checksum"
+INDIRIZZO = "https://github.com/Finalstepbitcoin/sintesi"
 USCITA = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                       "qr-verifica.svg.txt")
 

@@ -1,4 +1,4 @@
-# Guida d'uso — "Checksum Tool, guida in un foglio"
+# Guida d'uso — "Sintesi, guida pratica"
 
 Il foglio A4 **fronte/retro** che va nella scatola insieme al dispositivo.
 Parla a chi il dispositivo lo compra già pronto: come si accende, come si usano
@@ -14,7 +14,7 @@ Stessa testata, stessi font e stesso piede di pagina delle schede
 ```
 
 Il PDF finisce direttamente in
-`~/Desktop/SITO WEB/FILE DA INSERIRE NEL SITO/CHECKSUM TOOL - GUIDA IN UN FOGLIO.pdf`.
+`~/Desktop/SITO WEB/FILE DA INSERIRE NEL SITO/SINTESI - GUIDA PRATICA.pdf`.
 
 Lo script controlla da solo che la guida stia in **due pagine** e avvisa se
 sfora.
@@ -78,10 +78,19 @@ tre parole nuove, guarda qui prima che nel testo delle sezioni.
 
 ## Il codice QR
 
-Punta a `https://www.finalstepbitcoin.com/checksum`, la pagina dove stanno il
-file `.uf2` ufficiale, le istruzioni per riscrivere il firmware e lo strumento
-di verifica. **Quella pagina va creata prima di stampare la guida**: un QR che
-finisce su un errore 404 è peggio di nessun QR.
+Punta a `https://github.com/Finalstepbitcoin/sintesi`, il repository col
+codice sorgente (deciso il 24 agosto 2026, prima puntava a
+`finalstepbitcoin.com/checksum`).
+
+**Il repository è ancora PRIVATO**: va reso pubblico prima di stampare e
+spedire, altrimenti chi inquadra il QR trova una pagina 404 — peggio di
+nessun QR.
+
+**Il repository NON contiene un `.uf2` pronto da trascinare**: `firmware/` è
+in `.gitignore` e il MicroPython si scarica da micropython.org. Chi ci arriva
+trova il codice sorgente e le istruzioni per assemblarlo, non un file da
+copiare in trenta secondi — vedi la nota più sotto su cosa promette il testo
+della guida.
 
 Il QR è disegnato dentro `sorgente.html` come SVG, non è un'immagine esterna.
 Se l'indirizzo cambia:
@@ -98,6 +107,25 @@ l'unico controllo che conta.
 Il QR va **stampato**, non mostrato dal dispositivo: un firmware manomesso
 mostrerebbe sullo schermo un indirizzo falso, e manderebbe chi verifica su una
 pagina scritta da chi l'ha manomesso. La carta non la riscrive nessuno.
+
+### DA RISOLVERE prima di stampare: il `.uf2` che la guida promette
+
+Due punti del testo promettono un file di firmware pronto, che oggi su GitHub
+**non c'è**:
+
+- facciata 1, punto 2: «puoi scaricare il firmware da github.com/… e
+  installarlo in autonomia»
+- facciata 2, livello 2: «ci trascini sopra il file ufficiale. Trenta secondi,
+  niente da installare»
+
+Chi arriva sul repository trova invece il sorgente e la procedura del README
+(scaricare le liste, i test, MicroPython da micropython.org, `installa.py`):
+tutt'altro che trenta secondi. Le strade possibili sono due, da decidere:
+
+1. **pubblicare il `.uf2` assemblato** fra i Release di GitHub (o sul sito), e
+   lasciare il testo com'è;
+2. **cambiare il testo** della guida, dicendo che su GitHub c'è il codice da
+   compilare e non un file pronto.
 
 ## Da dove vengono i due logo
 

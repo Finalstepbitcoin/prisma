@@ -1,5 +1,5 @@
 """
-bip39_checksum.py  --  Final Step Bitcoin / Checksum Tool
+bip39_checksum.py  --  Final Step Bitcoin / Sintesi
 
 Il motore di calcolo. Gira identico sul Mac (Python 3) e sul dispositivo
 (MicroPython sul Raspberry Pi Pico 2).

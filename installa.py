@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-installa.py  --  Final Step Bitcoin / Checksum Tool
+installa.py  --  Final Step Bitcoin / Sintesi
 
 Copia sul dispositivo tutti i file che gli servono, in un colpo solo.
 

@@ -1,5 +1,5 @@
 """
-prova_percorsi.py  --  Final Step Bitcoin / Checksum Tool
+prova_percorsi.py  --  Final Step Bitcoin / Sintesi
 
 Ripercorre da solo tutte le strade dell'interfaccia, simulando le pressioni
 dei tasti, e controlla che nessuna finisca in errore.

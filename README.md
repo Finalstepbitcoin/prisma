@@ -1,4 +1,4 @@
-# Checksum Tool — Final Step Bitcoin
+# Sintesi — Final Step Bitcoin
 
 Un piccolo dispositivo **offline** che fa due cose sole:
 

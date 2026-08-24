@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-prepara_wordlist.py  --  Final Step Bitcoin / Checksum Tool
+prepara_wordlist.py  --  Final Step Bitcoin / Sintesi
 
 Scarica il dizionario ufficiale BIP39 (inglese, 2048 parole) e genera il
 file  wordlist.py  che verra' incluso nel firmware.

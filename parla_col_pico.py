@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-parla_col_pico.py  --  Final Step Bitcoin / Checksum Tool
+parla_col_pico.py  --  Final Step Bitcoin / Sintesi
 
 Piccolo strumento per parlare con il Pico senza installare NIENTE.
 Usa solo la libreria standard di Python (termios, select): niente pip,

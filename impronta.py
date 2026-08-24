@@ -1,5 +1,5 @@
 """
-impronta.py  --  Final Step Bitcoin / Checksum Tool
+impronta.py  --  Final Step Bitcoin / Sintesi
 
 L'impronta del firmware, mostrata all'accensione come tre parole BIP39.
 

@@ -1,5 +1,5 @@
 """
-diceware.py  --  Final Step Bitcoin / Checksum Tool
+diceware.py  --  Final Step Bitcoin / Sintesi
 
 Dai numeri dei dadi alle parole della passphrase.
 

@@ -1,12 +1,12 @@
 #!/bin/bash
-# Genera il PDF della guida d'uso del Checksum Tool.
+# Genera il PDF della guida d'uso di Sintesi.
 # I due logo del canale e il codice QR sono gia' dentro sorgente.html
 # come immagini incorporate: non servono file esterni.
 
 set -e
 CARTELLA="$(cd "$(dirname "$0")" && pwd)"
 SORGENTE="$CARTELLA/sorgente.html"
-USCITA="/Users/plak/Desktop/SITO WEB/FILE DA INSERIRE NEL SITO/CHECKSUM TOOL - GUIDA IN UN FOGLIO.pdf"
+USCITA="/Users/plak/Desktop/SITO WEB/FILE DA INSERIRE NEL SITO/SINTESI - GUIDA PRATICA.pdf"
 BRAVE="/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
 
 "$BRAVE" --headless --disable-gpu --no-pdf-header-footer \

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-prepara_impronta.py  --  Final Step Bitcoin / Checksum Tool
+prepara_impronta.py  --  Final Step Bitcoin / Sintesi
 
 Calcola sul computer la stessa impronta che il dispositivo mostra
 all'accensione.
