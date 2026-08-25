@@ -33,23 +33,45 @@ except ImportError:
     print("    .venv-strumenti/bin/pip install segno")
     sys.exit(1)
 
-# L'UNICO punto da cambiare se l'indirizzo della pagina cambia. Ricordati
-# di aggiornare anche la scritta sotto il QR dentro sorgente.html.
-INDIRIZZO = "https://github.com/Finalstepbitcoin/sintesi"
-USCITA = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                      "qr-verifica.svg.txt")
+# I QR stampati sulla guida. Per cambiarne uno basta cambiare l'indirizzo
+# qui: ricordati di aggiornare anche la scritta sotto il QR dentro
+# sorgente.html, che il generatore non tocca.
+#
+# La "classe" e' il nome del gruppo di stile nel foglio: il generatore la
+# scrive dentro l'SVG, cosi' ogni QR si incolla al posto di quello vecchio
+# cercando <svg class="NOME"> senza rischiare di scambiarli fra loro.
+QR = [
+    {
+        "nome": "verifica",
+        "classe": "qr",
+        "indirizzo": "https://github.com/Finalstepbitcoin/sintesi",
+        "a_cosa_serve": "il codice sorgente, per verificare o ricompilare",
+    },
+    {
+        "nome": "video",
+        "classe": "qr-video",
+        # SEGNAPOSTO: qui va il link diretto alla video guida, quando c'e'.
+        # Per ora punta al canale, cosi' chi inquadra non finisce su un
+        # errore - ma va sostituito prima di stampare.
+        "indirizzo": "https://www.youtube.com/@final_step_bitcoin",
+        "a_cosa_serve": "la video guida (SEGNAPOSTO: ancora il canale)",
+    },
+]
+CARTELLA = os.path.dirname(os.path.abspath(__file__))
 
 
-def main():
+def disegna(voce):
+    """Un QR: dall'indirizzo all'SVG gia' pronto da incollare."""
     # correzione d'errore media: sopporta bene la stampa e un po' di usura
     # del foglio, e resta piccolo abbastanza da stare in 26 mm
-    qr = segno.make(INDIRIZZO, error="m")
+    qr = segno.make(voce["indirizzo"], error="m")
     righe = ["".join("1" if m else "0" for m in riga) for riga in qr.matrix]
     lato = len(righe)
 
-    print("indirizzo : %s" % INDIRIZZO)
-    print("versione  : %s   correzione: %s" % (qr.version, qr.error.upper()))
-    print("lato      : %d moduli" % lato)
+    print("\n%s  (%s)" % (voce["nome"].upper(), voce["a_cosa_serve"]))
+    print("  indirizzo : %s" % voce["indirizzo"])
+    print("  versione  : %s   correzione: %s   lato: %d moduli"
+          % (qr.version, qr.error.upper(), lato))
 
     # controllo strutturale: i tre quadrati d'angolo devono esserci
     def quadrato(r0, c0):
@@ -58,9 +80,9 @@ def main():
                    else "0") for r in range(7) for c in range(7))
 
     if not all((quadrato(0, 0), quadrato(0, lato - 7), quadrato(lato - 7, 0))):
-        print("ERRORE: i quadrati di riferimento non sono al loro posto.")
+        print("  ERRORE: i quadrati di riferimento non sono al loro posto.")
         sys.exit(1)
-    print("angoli    : tutti e tre corretti")
+    print("  angoli    : tutti e tre corretti")
 
     # un rettangolo per ogni sequenza di moduli scuri: l'SVG resta piccolo
     d = []
@@ -79,20 +101,25 @@ def main():
     # il margine chiaro di 2 moduli attorno al codice lo vuole lo standard:
     # senza, molti telefoni non lo leggono
     lato_tot = lato + 4
-    svg = ('<svg class="qr" viewBox="-2 -2 %d %d" '
+    svg = ('<svg class="%s" viewBox="-2 -2 %d %d" '
            'xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">'
            '<rect x="-2" y="-2" width="%d" height="%d" fill="#fff"/>'
            '<path fill="#000" d="%s"/></svg>'
-           % (lato_tot, lato_tot, lato_tot, lato_tot, "".join(d)))
+           % (voce["classe"], lato_tot, lato_tot, lato_tot, lato_tot, "".join(d)))
 
-    with open(USCITA, "w", encoding="utf-8") as f:
+    uscita = os.path.join(CARTELLA, "qr-%s.svg.txt" % voce["nome"])
+    with open(uscita, "w", encoding="utf-8") as f:
         f.write(svg)
+    print("  generato  : qr-%s.svg.txt (%d byte)" % (voce["nome"], len(svg)))
 
-    print("generato  : %s (%d byte)" % (USCITA, len(svg)))
+
+def main():
+    for voce in QR:
+        disegna(voce)
     print()
-    print("Ora incolla il contenuto di quel file dentro sorgente.html,")
-    print("al posto del vecchio <svg class=\"qr\">...</svg>, e rilancia build.sh.")
-    print("Poi INQUADRALO COL TELEFONO dal PDF stampato: e' l'unico controllo")
+    print("Ora incolla ogni file dentro sorgente.html al posto del vecchio")
+    print('<svg class="..."> con la STESSA classe, e rilancia build.sh.')
+    print("Poi INQUADRALI COL TELEFONO dal PDF finale: e' l'unico controllo")
     print("che conta davvero.")
 
 
