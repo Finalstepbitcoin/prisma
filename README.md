@@ -75,10 +75,16 @@ python3 installa.py
 python3 prepara_impronta.py
 ```
 
-**Le liste di parole non stanno in questo repository**: si scaricano dalle
-fonti originali al momento della compilazione, e ognuna resta sotto la propria
-licenza. Gli script verificano che siano complete e ne stampano l'impronta
-SHA-256.
+**Le liste di parole si scaricano dalle fonti originali** al momento della
+compilazione, e ognuna resta sotto la propria licenza. In `liste-originali/`
+c'e' anche una copia archiviata delle due liste Diceware, usata **solo** se il
+download non riesce: serve a poter ricostruire il firmware anche se un domani
+il sito di un autore non ci fosse piu', ed e' cio' che permette a chi riceve
+un dispositivo gia' pronto di avere il sorgente corrispondente, come chiede la
+licenza GPL della lista italiana. In tutti e due i casi gli script verificano
+che la lista sia completa e ne confrontano l'impronta SHA-256 con quella
+scritta nel codice: la copia archiviata e' una rete di sicurezza, non una
+scorciatoia.
 
 ---
 
@@ -91,6 +97,7 @@ SHA-256.
 | `main.py` | tre righe: fa partire tutto all'accensione |
 | `interfaccia.py` | menu, inserimento delle parole, schermate |
 | `bip39_checksum.py` | il calcolo del checksum BIP39 |
+| `impronta.py` | le tre parole mostrate all'accensione |
 | `diceware.py` | dai numeri dei dadi alle parole |
 | `schermo.py` | driver del display e lettura dei comandi |
 
@@ -145,7 +152,10 @@ Fra questi ci sono due verifiche che vale la pena citare:
 
 All'accensione il dispositivo mostra **tre parole BIP39**. Sono i primi 33 bit
 dello SHA-256 di tutto quello che esegue: la memoria del firmware piu' il
-contenuto di ogni file del programma.
+contenuto di **ogni file presente nel dispositivo** — tutti, non solo i `.py`,
+comprese le sottocartelle. MicroPython infatti sa caricare anche i moduli gia'
+compilati (`.mpy`) e cerca in `/lib`: misurare i soli `.py` avrebbe lasciato
+uno spazio dove nascondere qualcosa.
 
 ```
 python3 prepara_impronta.py
@@ -154,7 +164,8 @@ python3 prepara_impronta.py
 calcola lo stesso valore sul computer. Se le tre parole coincidono, dentro il
 dispositivo c'e' esattamente quello che c'e' in questo repository.
 
-Basta aggiungere un file perche' cambino: e' proprio quello che devono fare.
+Basta aggiungere un file perche' cambino — di qualunque tipo, anche dentro
+una sottocartella: e' proprio quello che devono fare.
 
 **Attenzione a cosa dimostra, e cosa NON dimostra**: e' il firmware stesso a
 calcolare e mostrare queste tre parole. Un firmware malevolo mostrerebbe
@@ -212,6 +223,7 @@ revisionato da terzi. Trattalo di conseguenza.
 
 Il codice di questo progetto è sotto licenza **MIT** (vedi `LICENSE`).
 
-Le liste di parole non sono incluse qui e restano di chi le ha fatte. Il
-firmware assemblato, contenendo la lista Diceware italiana, esce sotto
-**GPL-3.0**. I dettagli sono in [`LICENZE-TERZI.md`](LICENZE-TERZI.md).
+Le liste di parole restano di chi le ha fatte, ognuna con la propria licenza,
+e sono archiviate in [`liste-originali/`](liste-originali/) insieme al testo
+della GPL. Il firmware assemblato, contenendo la lista Diceware italiana, esce
+sotto **GPL-3.0**. I dettagli sono in [`LICENZE-TERZI.md`](LICENZE-TERZI.md).
