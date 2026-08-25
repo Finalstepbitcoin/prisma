@@ -11,9 +11,14 @@ LE DUE LISTE SONO QUELLE DEL SITO, NON ALTRE:
   - inglese  : Arnold Reinhold, l'inventore del metodo.  Licenza CC-BY 4.0
   - italiana : Tarin Gamberini.                          Licenza GPL-3.0
 
-Le liste NON vengono messe nel repository: si scaricano al momento, dalle
-fonti originali. Cosi' il codice del progetto resta tutto nostro e la
-licenza di ciascuna lista resta la sua.
+DA DOVE ARRIVANO LE LISTE
+Si scaricano sempre dalle fonti originali. Nel repository c'e' anche una
+copia archiviata di ognuna, in liste-originali/, che viene usata SOLO se il
+download non riesce: serve a poter ricostruire il firmware anche fra dieci
+anni, e a soddisfare la licenza GPL della lista italiana, che chiede che chi
+riceve il firmware possa avere il sorgente corrispondente.
+In tutti e due i casi l'impronta SHA-256 viene confrontata con quella scritta
+qui sotto: la copia locale e' una rete di sicurezza, non una scorciatoia.
 
 REGOLA DA NON VIOLARE: le voci si copiano ESATTAMENTE come sono, comprese
 quelle con simboli e apostrofi (a&p, i've) o le cifre nude (0, 12).
@@ -25,10 +30,15 @@ Uso:
     python3 prepara_diceware.py
 """
 
+import ast
 import hashlib
+import os
 import re
 import sys
 import urllib.request
+
+CARTELLA = os.path.dirname(os.path.abspath(__file__))
+ARCHIVIO = "liste-originali"
 
 # "impronta_attesa": la SHA-256 della lista scaricata e verificata il 21
 # agosto 2026, quella con cui e' stato costruito il dispositivo. Se la fonte
@@ -47,6 +57,7 @@ LISTE = [
         "url": "https://theworld.com/~reinhold/diceware.wordlist.asc",
         "pagina": "https://theworld.com/~reinhold/diceware.html",
         "impronta_attesa": "3cd6164a99e95381f8620aec782a933545bcd5833fa331d267a6829f6665256e",
+        "archivio": "diceware-inglese-reinhold.asc",
     },
     {
         "nome": "italiana",
@@ -59,6 +70,7 @@ LISTE = [
         "pagina": "https://www.taringamberini.com/it/diceware_it_IT/"
                   "lista-di-parole-diceware-in-italiano/",
         "impronta_attesa": "b441559b64fb7041b9bbcecb3c43111f2523ec84e172670409f40c462eda0b93",
+        "archivio": "diceware-italiana-gamberini-v4.txt",
     },
 ]
 
@@ -66,10 +78,52 @@ LARGHEZZA = 6      # la voce piu' lunga, in entrambe le liste, e' di 6 caratteri
 ATTESE = 7776      # 6^5: cinque dadi a sei facce
 
 
-def scarica(url):
-    print("  scarico: %s" % url)
-    with urllib.request.urlopen(url, timeout=60) as r:
-        return r.read().decode("utf-8", "replace")
+def scarica(voce):
+    """
+    La lista, dalla fonte originale. Se non si raggiunge, dalla copia
+    archiviata in liste-originali/.
+
+    Chi ha scaricato cosa lo diciamo a voce alta: e' un'informazione che chi
+    costruisce il firmware deve vedere. Il controllo dell'impronta viene
+    fatto subito dopo, uguale nei due casi, quindi una copia archiviata
+    manomessa verrebbe fermata esattamente come un download manomesso.
+    """
+    try:
+        print("  scarico: %s" % voce["url"])
+        with urllib.request.urlopen(voce["url"], timeout=60) as r:
+            return r.read().decode("utf-8", "replace"), "fonte originale"
+    except Exception as e:
+        print("     non riuscito (%s)" % e)
+
+    percorso = os.path.join(CARTELLA, ARCHIVIO, voce["archivio"])
+    if not os.path.exists(percorso):
+        print("     e non c'e' nemmeno la copia in %s/" % ARCHIVIO)
+        print("     Non genero niente.")
+        sys.exit(1)
+    print("     uso la copia archiviata: %s/%s" % (ARCHIVIO, voce["archivio"]))
+    with open(percorso, "rb") as f:
+        return f.read().decode("utf-8", "replace"), "copia archiviata"
+
+
+def rileggi_costante(percorso, nome):
+    """
+    Rilegge una costante dal file appena scritto SENZA eseguirlo.
+
+    Prima qui c'era exec(), cioe' il file generato veniva ESEGUITO per
+    controllare che si rileggesse identico. Funzionava, ma vuol dire eseguire
+    del codice costruito a partire da un testo scaricato da internet - anche
+    se ancorato a uno SHA-256 e validato voce per voce. ast.parse legge il
+    testo e ne ricava la struttura senza eseguire niente: il controllo resta
+    lo stesso, ma non c'e' piu' niente che venga messo in moto.
+    """
+    with open(percorso, encoding="utf-8") as f:
+        albero = ast.parse(f.read(), percorso)
+    for nodo in albero.body:
+        if isinstance(nodo, ast.Assign):
+            for bersaglio in nodo.targets:
+                if isinstance(bersaglio, ast.Name) and bersaglio.id == nome:
+                    return ast.literal_eval(nodo.value)
+    raise ValueError("nel file generato manca la costante %s" % nome)
 
 
 def estrai(testo):
@@ -158,9 +212,7 @@ def genera(lista, voci, impronta):
         f.write(testo)
 
     # controprova: il file appena scritto si rilegge identico?
-    ambiente = {}
-    exec(compile(testo, lista["file"], "exec"), ambiente)
-    b = ambiente["BLOB"]
+    b = rileggi_costante(lista["file"], "BLOB")
     riletto = [b[i * LARGHEZZA:(i + 1) * LARGHEZZA].rstrip() for i in range(ATTESE)]
     if riletto != ordinate:
         print("ERRORE: il file generato non si rilegge correttamente.")
@@ -176,7 +228,7 @@ def main():
 
     for lista in LISTE:
         print("\nLista %s (%s, %s)" % (lista["nome"], lista["autore"], lista["licenza"]))
-        testo = scarica(lista["url"])
+        testo, provenienza = scarica(lista)
         impronta = hashlib.sha256(testo.encode("utf-8")).hexdigest()
 
         if impronta != lista["impronta_attesa"]:
@@ -198,6 +250,8 @@ def main():
                 print("    - %s" % e)
             sys.exit(1)
 
+        print("  provenienza: %s" % provenienza)
+        print("  impronta SHA-256 come attesa .................. ok")
         print("  7776 voci, tutti i codici da 11111 a 66666 ... ok")
         print("  nessun doppione .............................. ok")
         print("  nessuna voce oltre %d caratteri ............... ok" % LARGHEZZA)

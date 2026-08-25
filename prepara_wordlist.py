@@ -16,6 +16,7 @@ renderebbe il dispositivo sbagliato in modo silenzioso. Meglio prenderle
 dalla fonte ufficiale e controllarle automaticamente.
 """
 
+import ast
 import hashlib
 import sys
 import urllib.request
@@ -149,10 +150,23 @@ def genera(parole, impronta, url):
     with open("wordlist.py", "w", encoding="utf-8") as f:
         f.write(testo)
 
-    # controllo finale: quello che ho scritto si rilegge identico?
-    ambiente = {}
-    exec(compile(testo, "wordlist.py", "exec"), ambiente)
-    riletto = [ambiente["BLOB"][i * LARGHEZZA:(i + 1) * LARGHEZZA].rstrip()
+    # Controllo finale: quello che ho scritto si rilegge identico?
+    # Si rilegge SENZA eseguire il file. Prima qui c'era exec(): funzionava,
+    # ma vuol dire eseguire del codice costruito a partire da un testo
+    # scaricato da internet - anche se ancorato a uno SHA-256 e validato
+    # parola per parola. ast.parse ricava la struttura del file senza
+    # mettere in moto niente.
+    with open("wordlist.py", encoding="utf-8") as f:
+        albero = ast.parse(f.read(), "wordlist.py")
+    blob = None
+    for nodo in albero.body:
+        if isinstance(nodo, ast.Assign) and any(
+                isinstance(b, ast.Name) and b.id == "BLOB" for b in nodo.targets):
+            blob = ast.literal_eval(nodo.value)
+    if blob is None:
+        print("ERRORE: nel file generato manca la costante BLOB.")
+        sys.exit(1)
+    riletto = [blob[i * LARGHEZZA:(i + 1) * LARGHEZZA].rstrip()
                for i in range(len(parole))]
     if riletto != parole:
         print("ERRORE: il file generato non si rilegge correttamente.")
