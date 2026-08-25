@@ -82,20 +82,31 @@ def main():
     if presenti is None:
         return 1
     attesi = set(FILE_DISPOSITIVO)
-    estranei = sorted(n for n in presenti if n.endswith(".py") and n not in attesi)
+    # QUALUNQUE nome non previsto, non solo i .py: l'impronta misura tutti i
+    # file, di ogni estensione, e MicroPython sa caricare anche i .mpy. Un
+    # nome che compare qui e non e' un file puo' essere una CARTELLA (per
+    # esempio /lib): l'elenco mostra solo il primo livello, ma basta vederla
+    # per sapere che c'e' qualcosa da guardare.
+    estranei = sorted(n for n in presenti
+                      if n not in attesi and not n.endswith(".tmp"))
     residui = sorted(n for n in presenti if n.endswith(".tmp"))
     if estranei:
-        print("\nATTENZIONE: sul dispositivo ci sono file .py non previsti:")
+        print("\nATTENZIONE: sul dispositivo c'e' roba non prevista:")
         for n in estranei:
             print("  - %s" % n)
-        print("Potrebbero cambiare l'impronta del firmware. Rimuovili a mano.")
+        print("Cambia l'impronta del firmware, quindi il dispositivo mostrera'")
+        print("tre parole diverse da quelle pubblicate. Va rimossa: se e' un")
+        print("file con os.remove, se e' una cartella va svuotata e poi tolta")
+        print("con os.rmdir.")
     if residui:
         print("\nATTENZIONE: residui di una preparazione mai completata (una")
         print("copia interrotta prima di questa installazione):")
         for n in residui:
             print("  - %s" % n)
-        print("Innocui - non vengono ne' eseguiti ne' contati nell'impronta - ma")
-        print("meglio ripulirli, per esempio con:")
+        print("Non vengono eseguiti, ma SONO CONTATI NELL'IMPRONTA come")
+        print("qualunque altro file: finche' restano li', le tre parole")
+        print("mostrate all'accensione non saranno quelle pubblicate.")
+        print("Vanno tolti, per esempio con:")
         for n in residui:
             print("    python3 parla_col_pico.py esegui \"import os; os.remove(%r)\"" % n)
     if not estranei and not residui:

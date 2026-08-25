@@ -24,7 +24,8 @@ Entrambe sono descritte nella guida.
 COSA VIENE MISURATO
   1. mezzo megabyte di memoria flash a partire dall'inizio: e' li' che sta
      MicroPython, il resto della zona e' vuoto e quindi sempre uguale
-  2. tutti i file .py del programma, in ordine alfabetico, nome compreso
+  2. TUTTI i file presenti nel dispositivo, in ordine, percorso compreso -
+     non solo i .py, e non solo quelli della cartella principale
 
 Le due cose insieme coprono tutto quello che il dispositivo esegue.
 Lo stesso valore si ricalcola sul computer con prepara_impronta.py.
@@ -47,13 +48,42 @@ ZONA_FIRMWARE = 448 * 1024
 PAROLE = 3                      # 3 x 11 bit = 33 bit di impronta
 
 
-def _aggiungi_file(h):
-    """I file del programma, in ordine, nome compreso."""
-    for nome in sorted(os.listdir("/")):
-        if not nome.endswith(".py"):
+def _e_cartella(percorso):
+    """Vero se il percorso e' una cartella e non un file."""
+    try:
+        return os.stat(percorso)[0] & 0x4000 != 0
+    except OSError:
+        return False
+
+
+def _aggiungi_file(h, cartella="/"):
+    """
+    TUTTI i file, in ordine, percorso compreso. Anche quelli dentro le
+    sottocartelle, e anche quelli che non finiscono per .py.
+
+    PERCHE' TUTTI E NON SOLO I .py (e' il motivo per cui questa funzione
+    esiste in questa forma):
+    MicroPython non esegue soltanto i file .py. Sa caricare anche i .mpy,
+    cioe' moduli gia' compilati, e cerca i moduli anche nella cartella
+    /lib. Misurando i soli .py della cartella principale, un file aggiunto
+    con un'altra estensione, o nascosto in una sottocartella, non avrebbe
+    cambiato le tre parole - mentre la guida promette il contrario, cioe'
+    che basta aggiungere un file perche' cambino.
+
+    Il nome misurato e' il percorso senza la barra iniziale: "main.py",
+    oppure "lib/qualcosa.mpy". Su un dispositivo pulito, dove ci sono solo
+    i file del programma nella cartella principale, il valore e' identico
+    a quello che si otterrebbe misurando i soli nomi: la copertura si
+    allarga, il numero non cambia.
+    """
+    for nome in sorted(os.listdir(cartella)):
+        percorso = cartella + nome if cartella.endswith("/") \
+            else cartella + "/" + nome
+        if _e_cartella(percorso):
+            _aggiungi_file(h, percorso)
             continue
-        h.update(nome.encode())
-        with open(nome, "rb") as f:
+        h.update(percorso[1:].encode())     # senza la barra iniziale
+        with open(percorso, "rb") as f:
             while True:
                 pezzo = f.read(1024)
                 if not pezzo:

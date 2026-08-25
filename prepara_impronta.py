@@ -11,10 +11,19 @@ GIRA SUL MAC. Serve per due cose:
 
 Il calcolo e' identico a quello di impronta.py sul dispositivo:
   - mezzo megabyte di memoria flash dall'inizio (MicroPython, poi vuoto)
-  - tutti i file .py installati, in ordine alfabetico, nome compreso
+  - i file installati, in ordine alfabetico, nome compreso
+
+DIFFERENZA VOLUTA FRA I DUE LATI: qui si misurano i file della lista qui
+sotto, cioe' quelli che DEVONO stare sul dispositivo; il dispositivo invece
+misura quelli che ci sono DAVVERO, tutti, compresi i .mpy e le
+sottocartelle. Su un dispositivo pulito i due conti danno lo stesso numero.
+Se qualcuno aggiunge un file, il dispositivo mostra tre parole diverse da
+quelle calcolate qui: e' esattamente quello che deve succedere.
 
 Uso:
     python3 prepara_impronta.py
+    python3 prepara_impronta.py --parole    (stampa solo le tre parole:
+                                             lo usa guida/build.sh)
 """
 
 import hashlib
@@ -162,6 +171,17 @@ def parole_da(digest):
             for i in range(PAROLE)]
 
 
+def calcola_parole(uf2):
+    """L'impronta attesa, come tre parole. Non stampa niente."""
+    h = hashlib.sha256()
+    h.update(immagine_flash(uf2))
+    for nome in sorted(FILE_DISPOSITIVO):
+        h.update(nome.encode())
+        with open(nome, "rb") as f:
+            h.update(f.read())
+    return h.digest(), parole_da(h.digest())
+
+
 def main():
     uf2 = verifica_uf2(trova_uf2())
 
@@ -199,5 +219,33 @@ def main():
     print("Se ne mostra altre, il contenuto e' diverso da questo.")
 
 
+def solo_parole():
+    """
+    Stampa le tre parole e basta, senza intestazioni.
+
+    Serve a guida/build.sh, che deve confrontarle con quelle stampate sul
+    foglio: un confronto fatto da un programma non puo' permettersi di
+    andare a pescare la riga giusta in mezzo a un rapporto.
+    """
+    uf2 = verifica_uf2(trova_uf2())
+    mancanti = [f for f in FILE_DISPOSITIVO if not os.path.exists(f)]
+    if mancanti:
+        print("ERRORE: mancano dei file da installare: %s" % ", ".join(mancanti),
+              file=sys.stderr)
+        sys.exit(1)
+    # immagine_flash() stampa una riga di riepilogo: qui non deve finire
+    # nell'uscita vera, quindi la mandiamo via insieme al resto
+    vero_stdout = sys.stdout
+    sys.stdout = sys.stderr
+    try:
+        _, tre = calcola_parole(uf2)
+    finally:
+        sys.stdout = vero_stdout
+    print(" ".join(w.upper() for w in tre))
+
+
 if __name__ == "__main__":
-    main()
+    if "--parole" in sys.argv:
+        solo_parole()
+    else:
+        main()
