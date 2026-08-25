@@ -17,7 +17,16 @@ import re,sys
 d=open(sys.argv[1],'rb').read()
 print(len(re.findall(rb'/Type\s*/Page[^s]', d)))" "$USCITA")
 
+# La stessa copia va anche nel repository, per chi vuole scaricarsi la guida
+# senza comprare il dispositivo. Copiarla qui in automatico e' l'unico modo
+# per essere sicuri che le due non divergano: se restasse da fare a mano,
+# prima o poi si ristampa il foglio e ci si dimentica di aggiornare GitHub,
+# e chi scarica il PDF si ritrova tre parole d'impronta che non sono piu'
+# quelle del firmware consegnato.
+cp "$USCITA" "$CARTELLA/SINTESI - GUIDA PRATICA.pdf"
+
 echo "PDF creato: $USCITA"
+echo "  copia nel repository: guida/SINTESI - GUIDA PRATICA.pdf"
 echo "Pagine: $PAGINE"
 if [ "$PAGINE" != "2" ]; then
   echo "ATTENZIONE: la guida deve stare in DUE pagine (un foglio fronte/retro)."
