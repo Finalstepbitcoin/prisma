@@ -1,4 +1,4 @@
-# Sintesi — Final Step Bitcoin
+# Sintesi — calcolatore offline
 
 Un piccolo dispositivo **offline** che fa due cose sole:
 
