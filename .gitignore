@@ -18,3 +18,8 @@ __pycache__/
 *.pyc
 .DS_Store
 .venv-strumenti/
+
+# Le note di stampa della guida (come si rigenera il PDF, il vincolo delle
+# due facciate, la procedura del QR): servono a produrre il foglio, non a
+# costruire o verificare il dispositivo. Restano sul disco.
+guida/NOTE-DI-STAMPA.md
