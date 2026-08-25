@@ -23,3 +23,9 @@ __pycache__/
 # due facciate, la procedura del QR): servono a produrre il foglio, non a
 # costruire o verificare il dispositivo. Restano sul disco.
 guida/NOTE-DI-STAMPA.md
+
+# I referti delle revisioni di sicurezza. Sono documenti di lavoro, scritti
+# per chi il progetto lo costruisce: parlano di scelte interne, di rischi
+# accettati e di cose da fare. Se un giorno se ne pubblica uno, va riscritto
+# per un lettore esterno, non semplicemente aggiunto qui.
+REVISIONE-*.md
