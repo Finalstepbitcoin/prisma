@@ -29,3 +29,6 @@ guida/NOTE-DI-STAMPA.md
 # accettati e di cose da fare. Se un giorno se ne pubblica uno, va riscritto
 # per un lettore esterno, non semplicemente aggiunto qui.
 REVISIONE-*.md
+
+# Il file unico prodotto da crea_uf2.py: si rigenera, non si conserva
+sintesi-*.uf2
