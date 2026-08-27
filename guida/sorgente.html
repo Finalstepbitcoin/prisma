@@ -65,8 +65,17 @@
   .passi .t .nota { display:block; color:var(--grigio); font-size:8.2pt; margin-top:0.6mm; }
 
   /* ---------- impronta ---------- */
-  .impronta { display:flex; align-items:center; gap:4mm; border:1.4px solid var(--ar);
-              background:#fff; padding:2.4mm 3.4mm; }
+  .impronta { border:1.4px solid var(--ar); background:#fff; padding:2.2mm 3.4mm; }
+  .impronta .riga { display:flex; align-items:center; gap:4mm; }
+  /* La chiave Nostr sta DENTRO il riquadro, su una riga sola sotto le altre
+     due colonne: dentro la colonna stretta di sinistra i suoi 63 caratteri si
+     spezzerebbero a meta'. Monospaziato perche' chi controlla la confronta
+     carattere per carattere, e nei font proporzionali la l e la I si
+     assomigliano troppo. */
+  .impronta .nostr { font-size:7pt; color:var(--grigio); margin-top:1.4mm;
+                     padding-top:1.2mm; border-top:1px solid var(--bordo); }
+  .impronta .nostr .chiave { font-family:"Menlo",monospace; font-size:6.9pt;
+                             color:#111; }
   .impronta .k { font-family:"Menlo",monospace; font-size:7.5pt; letter-spacing:1.4px;
                  color:var(--ar-scuro); font-weight:700; }
   .impronta .parole { font-family:"Menlo",monospace; font-weight:700; font-size:10.5pt;
@@ -175,12 +184,16 @@
   <h2><span class="num">2</span>ACCENDILO E CONTROLLA L&rsquo;IMPRONTA</h2>
   <p class="occhiello">Collegalo con un cavo micro-USB a un <b>caricatore da telefono</b>, non al computer: molte power bank potrebbero non funzionare perch&eacute; il dispositivo assorbe pochissimo. Per una maggiore sicurezza puoi aggiungere un <b>Data Blocker USB</b>. Non c&rsquo;&egrave; niente da installare, parte da solo. Ma se non ti fidi, puoi scaricare il firmware da <a href="https://github.com/Finalstepbitcoin/prisma">github.com/Finalstepbitcoin/prisma</a> e installarlo in autonomia.</p>
   <div class="impronta">
+    <div class="riga">
     <div>
       <div class="k">ALL&rsquo;ACCENSIONE DEVE MOSTRARE</div>
       <div class="parole">LIQUID &nbsp;SINCE &nbsp;TRUST</div>
     </div>
     <div class="spiega">Sono l&rsquo;impronta di tutto quello che il dispositivo esegue. Se ne mostra tre diverse, dentro c&rsquo;&egrave; qualcosa di diverso: <b>fermati</b> e riscrivi il firmware.<br>
       Protegge solo da un guasto accidentale, <b>non da una manomissione voluta</b>: un firmware manomesso potrebbe mostrarle comunque giuste. Verifica vera al punto 6.</div>
+  </div>
+    <div class="nostr">Confrontale con quelle pubblicate su Nostr da questa chiave:
+      <span class="chiave">npub17ugguepv89nvdrd72j7j25ymuts6w3d3lnsg6f0xgm2ah8zskhqq3v5ulj</span></div>
   </div>
 
   <h2><span class="num">3</span>I COMANDI</h2>
