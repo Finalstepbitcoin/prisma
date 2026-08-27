@@ -40,3 +40,11 @@ sintesi-*.uf2
 # PDF della guida. E' una cosa personale di quel computer: non e' del
 # progetto e non deve finire nel repository.
 guida/copia-locale.txt
+
+# La custodia: il disegno non e' ancora definitivo, e finche' non lo e' non
+# deve uscire dal Mac - altrimenti qualcuno stampa un pezzo sbagliato. Le
+# prove restano tutte sul disco, nel repository resta solo il foglietto che
+# spiega perche' la cartella e' vuota.
+case/*
+!case/LEGGIMI.md
+
