@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-crea_uf2.py  --  Final Step Bitcoin / Sintesi
+crea_uf2.py  --  Final Step Bitcoin / Prisma
 
 Costruisce UN SOLO file da trascinare sul dispositivo, che contiene sia
 MicroPython sia il programma.
@@ -210,7 +210,7 @@ def main():
     blocchi_archivio = blocchi_da(immagine, INIZIO_FLASH + ARCHIVIO_INIZIO,
                                   famiglia)
 
-    uscita = "sintesi-%s.uf2" % VERSIONE
+    uscita = "prisma-%s.uf2" % VERSIONE
     totale = scrivi_uf2(blocchi_firmware + blocchi_archivio, uscita)
 
     peso = os.path.getsize(uscita)

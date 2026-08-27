@@ -8,7 +8,7 @@ terminale".
 
 | File | Cosa fa |
 |---|---|
-| `crea_uf2.py` | costruisce `sintesi-<versione>.uf2` |
+| `crea_uf2.py` | costruisce `prisma-<versione>.uf2` |
 | `prova_uf2.py` | rilegge il file prodotto e controlla che dentro ci sia il giusto |
 
 Non è stata toccata **nessuna riga** del programma che gira sul dispositivo:
@@ -17,7 +17,7 @@ cambia solo il modo in cui i file ci arrivano dentro.
 ## Come si usa
 
 ```bash
-.venv-strumenti/bin/python crea_uf2.py     # produce sintesi-1.0.uf2
+.venv-strumenti/bin/python crea_uf2.py     # produce prisma-1.0.uf2
 .venv-strumenti/bin/python prova_uf2.py    # 11 controlli, senza dispositivo
 ```
 
@@ -89,7 +89,7 @@ niente di vecchio resta raggiungibile.
 Tutto quello che si poteva verificare senza dispositivo è verificato
 (`prova_uf2.py`, 11 controlli). Resta la prova vera:
 
-1. tenere premuto BOOTSEL, collegare il cavo, trascinare `sintesi-1.0.uf2`
+1. tenere premuto BOOTSEL, collegare il cavo, trascinare `prisma-1.0.uf2`
 2. il dispositivo deve **ripartire da solo** e mostrare `BLAST SAIL SPOIL`
 3. controllare che i due modi funzionino (checksum e passphrase)
 4. `python3 parla_col_pico.py elenco` deve elencare esattamente dieci file

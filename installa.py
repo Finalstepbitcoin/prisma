@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-installa.py  --  Final Step Bitcoin / Sintesi
+installa.py  --  Final Step Bitcoin / Prisma
 
 Copia sul dispositivo tutti i file che gli servono, in un colpo solo.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-prova_uf2.py  --  Final Step Bitcoin / Sintesi
+prova_uf2.py  --  Final Step Bitcoin / Prisma
 
 Controlla il file unico prodotto da crea_uf2.py, senza bisogno del
 dispositivo: lo rilegge e ricostruisce com'e' fatta la memoria del Pico
@@ -61,7 +61,7 @@ def memoria_da(blocchi, inizio, quanti_byte):
 
 
 def main():
-    uscita = "sintesi-%s.uf2" % c.VERSIONE
+    uscita = "prisma-%s.uf2" % c.VERSIONE
     ufficiale = imp.verifica_uf2(imp.trova_uf2())
 
     print("=" * 62)

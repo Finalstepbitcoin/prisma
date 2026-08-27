@@ -1,5 +1,5 @@
 """
-impronta.py  --  Final Step Bitcoin / Sintesi
+impronta.py  --  Final Step Bitcoin / Prisma
 
 L'impronta del firmware, mostrata all'accensione come tre parole BIP39.
 

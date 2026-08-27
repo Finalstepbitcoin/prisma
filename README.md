@@ -1,4 +1,4 @@
-# Sintesi — calcolatore offline
+# Prisma — calcolatore offline
 
 Un piccolo dispositivo **offline** che fa due cose sole:
 

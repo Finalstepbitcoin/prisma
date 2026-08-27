@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-prepara_diceware.py  --  Final Step Bitcoin / Sintesi
+prepara_diceware.py  --  Final Step Bitcoin / Prisma
 
 Scarica le due liste Diceware pubblicate sul sito e le trasforma nei file
 che il dispositivo puo' leggere.
