@@ -1,4 +1,4 @@
-# Sintesi — calcolatore offline
+# Prisma — calcolatore offline
 
 Un piccolo dispositivo **offline** che fa due cose sole:
 
@@ -181,8 +181,16 @@ SPENTI, con un canale che il firmware non controlla:
 
 - `picotool save -a` / `picotool verify` da BOOTSEL, che risponde il
   bootloader in ROM col firmware fermo — vedi la guida
-- oppure riflashare tu stesso il `.uf2` ufficiale, che sostituisce
-  qualunque cosa ci fosse prima
+- oppure riscrivere tu stesso il firmware: invece di controllare quello che
+  c'e' dentro, lo sostituisci con quello che scarichi tu
+
+  **Attenzione al modo in cui si riscrive.** Il `.uf2` di MicroPython occupa
+  i primi 320 KB della memoria, e il caricatore scrive SOLO i blocchi
+  contenuti nel file: tutto quello che sta piu' in alto — compreso l'archivio
+  dove vivono i dieci `.py` del programma — resta dov'era. Riscrivere
+  MicroPython da solo quindi NON cancella i file gia' presenti. Per
+  sostituire davvero tutto, la memoria va azzerata prima (`flash_nuke.uf2`
+  di Raspberry Pi, oppure `picotool erase`).
 
 ---
 
