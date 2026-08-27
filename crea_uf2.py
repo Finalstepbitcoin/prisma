@@ -289,21 +289,27 @@ def main():
     print("  DA PUBBLICARE SU NOSTR, PRIMA DI STAMPARE IL FOGLIO")
     print("=" * 62)
     print("""
-PRISMA %s - calcolatore BIP39 offline
+PRISMA \u2014 il calcolatore offline
 
-Impronta del firmware di questa release. All'accensione il
-dispositivo deve mostrare esattamente queste tre parole:
+IMPRONTA DEL FIRMWARE %s
+
+All'accensione il dispositivo deve mostrare esattamente queste
+tre parole:
 
 %s
 
-File:    prisma-%s.uf2
-SHA-256: %s
+Se ne mostra tre diverse, dentro c'\u00e8 qualcosa di diverso:
+fermati e riscrivi il firmware.
 
-Codice, file da caricare e guida:
+Questa nota \u00e8 la fonte con cui confrontarle: sul foglio dentro
+la scatola c'\u00e8 scritto di verificarle qui.
+
+File da caricare: prisma-%s.uf2
+SHA-256:
+%s
+
+Codice, file e guida:
 https://github.com/Finalstepbitcoin/prisma/releases/tag/v%s
-
-Il file si ricostruisce dal sorgente e viene identico, byte per
-byte: non e' necessario fidarsi di me.
 
 #bitcoin #nostr
 """ % (VERSIONE, parole, VERSIONE, impronta_file, VERSIONE))
