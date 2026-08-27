@@ -7,7 +7,7 @@ diceware_it.py
 # Il firmware MicroPython si scarica da micropython.org
 firmware/
 
-# Il marchio (lettering SINTESI, logo del canale) resta fuori dal
+# Il marchio (lettering PRISMA, logo del canale) resta fuori dal
 # repository: serve a stampare i materiali, non a costruire o verificare
 # il dispositivo, e il logo e' gia' incorporato nella guida. I file
 # restano sul disco in marchio/, semplicemente non vengono pubblicati.

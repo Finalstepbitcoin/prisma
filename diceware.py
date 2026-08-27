@@ -1,5 +1,5 @@
 """
-diceware.py  --  Final Step Bitcoin / Sintesi
+diceware.py  --  Final Step Bitcoin / Prisma
 
 Dai numeri dei dadi alle parole della passphrase.
 

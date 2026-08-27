@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-test_bip39.py  --  Final Step Bitcoin / Sintesi
+test_bip39.py  --  Final Step Bitcoin / Prisma
 
 Verifica che il motore di calcolo sia corretto, confrontandolo con i
 VETTORI DI TEST UFFICIALI dello standard BIP39.

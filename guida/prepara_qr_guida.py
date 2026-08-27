@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-prepara_qr_guida.py  --  Final Step Bitcoin / Sintesi
+prepara_qr_guida.py  --  Final Step Bitcoin / Prisma
 
 Disegna il codice QR stampato sulla guida (facciata 2, riquadro della
 verifica del firmware) e lo salva come immagine SVG gia' pronta in
@@ -44,7 +44,7 @@ QR = [
     {
         "nome": "verifica",
         "classe": "qr",
-        "indirizzo": "https://github.com/Finalstepbitcoin/sintesi",
+        "indirizzo": "https://github.com/Finalstepbitcoin/prisma",
         "a_cosa_serve": "il codice sorgente, per verificare o ricompilare",
     },
     {

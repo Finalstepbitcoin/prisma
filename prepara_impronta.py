@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-prepara_impronta.py  --  Final Step Bitcoin / Sintesi
+prepara_impronta.py  --  Final Step Bitcoin / Prisma
 
 Calcola sul computer la stessa impronta che il dispositivo mostra
 all'accensione.

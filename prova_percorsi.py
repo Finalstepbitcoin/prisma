@@ -1,5 +1,5 @@
 """
-prova_percorsi.py  --  Final Step Bitcoin / Sintesi
+prova_percorsi.py  --  Final Step Bitcoin / Prisma
 
 Ripercorre da solo tutte le strade dell'interfaccia, simulando le pressioni
 dei tasti, e controlla che nessuna finisca in errore.

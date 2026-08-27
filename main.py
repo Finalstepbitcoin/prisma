@@ -1,5 +1,5 @@
 """
-main.py  --  Final Step Bitcoin / Sintesi
+main.py  --  Final Step Bitcoin / Prisma
 
 MicroPython esegue questo file DA SOLO a ogni accensione.
 
