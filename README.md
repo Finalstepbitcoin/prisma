@@ -53,7 +53,10 @@ progetto possa offrire. È un pregio, non una mancanza.
 
 ## Come si costruisce
 
-Serve solo Python 3 sul Mac o sul PC. Nessuna libreria da installare.
+Serve Python 3 sul Mac o sul PC. Gli script usano solo la libreria standard,
+tranne i due che impacchettano il file unico e disegnano il QR: quelli
+vogliono una libreria ciascuno, installata in un ambiente isolato e con
+l'impronta verificata (vedi `LEGGIMI-uf2.md`).
 
 ```bash
 # 1. scarica dizionario e liste dalle fonti ufficiali, e disegna il QR
@@ -65,13 +68,11 @@ python3 prepara_diceware.py
 python3 test_bip39.py
 python3 test_diceware.py
 
-# 3. carica MicroPython sul Pico: tieni premuto BOOTSEL mentre colleghi il
-#    cavo, poi trascina il file .uf2 sul disco RP2350 che compare
+# 3. impacchetta tutto in un file solo
+.venv-strumenti/bin/python crea_uf2.py       # produce prisma-<versione>.uf2
+.venv-strumenti/bin/python prova_uf2.py      # 12 controlli, senza dispositivo
 
-# 4. copia tutto sul dispositivo
-python3 installa.py
-
-# 5. annota le tre parole da pubblicare e stampare
+# 4. annota le tre parole da pubblicare e stampare
 python3 prepara_impronta.py
 ```
 
@@ -85,6 +86,44 @@ licenza GPL della lista italiana. In tutti e due i casi gli script verificano
 che la lista sia completa e ne confrontano l'impronta SHA-256 con quella
 scritta nel codice: la copia archiviata e' una rete di sicurezza, non una
 scorciatoia.
+
+---
+
+## Come si carica sul dispositivo
+
+**Un file solo, e niente da installare sul computer.**
+
+1. tieni premuto **BOOTSEL** mentre colleghi il cavo;
+2. rilascia: compare un disco chiamato **RP2350**;
+3. **trascina** `prisma-<versione>.uf2` su quel disco.
+
+Il dispositivo si riavvia da solo dopo un paio di secondi e il disco
+sparisce. Se il sistema avvisa che il disco non e' stato espulso
+correttamente, e' normale: vuol dire che ha funzionato. All'accensione
+devono comparire le tre parole dell'impronta.
+
+**Su macOS il file va trascinato dal Finder, non copiato da terminale.**
+`cp` scrive i settori in un ordine che il caricatore del Pico non accetta:
+il file passa, il comando non da' errore, ma il dispositivo resta fermo in
+BOOTSEL senza riavviarsi.
+
+Dentro quel file c'e' **MicroPython intatto**, gli stessi byte che
+distribuisce micropython.org, piu' un archivio con i file del programma.
+Non e' una versione modificata: `prova_uf2.py` rilegge il file appena
+prodotto e lo dimostra, blocco per blocco, prima che tu lo carichi.
+
+### La strada lunga, per chi sviluppa
+
+Chi lavora al codice e vuole cambiare un file alla volta senza rifare il
+pacchetto ogni volta puo' ancora caricare MicroPython per conto suo e poi
+copiare i file col terminale:
+
+```bash
+python3 installa.py     # copia tutti i file sul dispositivo in un colpo solo
+```
+
+Serve solo a questo. Per usare il dispositivo, o per darlo a qualcuno, la
+strada e' il file unico qui sopra.
 
 ---
 
@@ -111,7 +150,9 @@ scorciatoia.
 | `test_diceware.py` | riconfronta le liste con le fonti, voce per voce |
 | `prepara_qr.py` | disegna il QR del canale (unico script con una dipendenza) |
 | `prepara_impronta.py` | calcola l'impronta attesa, da pubblicare e stampare |
-| `installa.py` | copia tutti i file sul dispositivo in un colpo solo |
+| `crea_uf2.py` | impacchetta MicroPython e il programma in **un file solo** |
+| `prova_uf2.py` | rilegge quel file e controlla che dentro ci sia il giusto |
+| `installa.py` | la strada lunga: copia i file uno a uno, serve solo a chi sviluppa |
 | `parla_col_pico.py` | parla col dispositivo senza installare programmi |
 | `prova_percorsi.py` | ripercorre da solo tutte le strade dell'interfaccia |
 
