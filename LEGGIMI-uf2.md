@@ -20,7 +20,7 @@ cambia solo il modo in cui i file ci arrivano dentro.
 
 ```bash
 .venv-strumenti/bin/python crea_uf2.py     # produce prisma-1.0.uf2
-.venv-strumenti/bin/python prova_uf2.py    # 11 controlli, senza dispositivo
+.venv-strumenti/bin/python prova_uf2.py    # 12 controlli, senza dispositivo
 ```
 
 ## La libreria in più
@@ -89,7 +89,7 @@ niente di vecchio resta raggiungibile.
 ## DA FARE: la prova sull'hardware
 
 Tutto quello che si poteva verificare senza dispositivo è verificato
-(`prova_uf2.py`, 11 controlli). Resta la prova vera:
+(`prova_uf2.py`, 12 controlli). Resta la prova vera:
 
 1. tenere premuto BOOTSEL, collegare il cavo, trascinare `prisma-1.0.uf2`
 2. il dispositivo deve **ripartire da solo** e mostrare `BLAST SAIL SPOIL`

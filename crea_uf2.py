@@ -47,6 +47,7 @@ altrimenti il dispositivo si accende e non trova niente:
 
 import hashlib
 import os
+import re
 import struct
 import sys
 
@@ -80,7 +81,11 @@ FILE_DISPOSITIVO = (
     "wordlist.py",
 )
 
-VERSIONE = "1.0"
+# La versione NON si scrive qui: si legge da interfaccia.py, che e' quella
+# che il dispositivo mostra sullo schermo. Tenendone due copie, prima o poi
+# il nome del file e la scritta sullo schermo direbbero numeri diversi.
+VERSIONE = re.search(r'VERSIONE\s*=\s*"([^"]+)"',
+                     open("interfaccia.py").read()).group(1)
 
 
 # ---------------------------------------------------------------------------

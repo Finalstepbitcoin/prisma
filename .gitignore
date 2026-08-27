@@ -32,6 +32,11 @@ REVISIONE-*.md
 
 # Il file unico prodotto da crea_uf2.py: si rigenera, non si conserva
 prisma-*.uf2
-# Il vecchio nome resta ignorato finche' non ricompili: il .uf2 gia' sul
-# disco si chiama ancora sintesi-1.0.uf2 e dentro ha il vecchio nome.
+# Il dispositivo si e' chiamato Sintesi fino al 27/08/2026: se in giro resta
+# un .uf2 col vecchio nome, non deve finire qui dentro.
 sintesi-*.uf2
+
+# Il percorso, sul computer di chi stampa, dove tenere una copia in piu' del
+# PDF della guida. E' una cosa personale di quel computer: non e' del
+# progetto e non deve finire nel repository.
+guida/copia-locale.txt

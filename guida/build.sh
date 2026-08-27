@@ -7,7 +7,15 @@ set -e
 CARTELLA="$(cd "$(dirname "$0")" && pwd)"
 PROGETTO="$(dirname "$CARTELLA")"
 SORGENTE="$CARTELLA/sorgente.html"
-USCITA="/Users/plak/Desktop/SITO WEB/FILE DA INSERIRE NEL SITO/PRISMA - GUIDA PRATICA.pdf"
+# Il PDF nasce dentro il repository: e' l'unico posto che esiste su
+# qualunque computer. Chi lo stampa spesso puo' volerne una copia anche
+# altrove (una cartella da caricare sul sito, per dire): basta scrivere quel
+# percorso dentro guida/copia-locale.txt, che resta fuori dal repository.
+USCITA="$CARTELLA/PRISMA - GUIDA PRATICA.pdf"
+COPIA_LOCALE=""
+if [ -f "$CARTELLA/copia-locale.txt" ]; then
+  COPIA_LOCALE="$(head -1 "$CARTELLA/copia-locale.txt")"
+fi
 BRAVE="/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
 
 # ---------------------------------------------------------------------------
@@ -57,16 +65,16 @@ import re,sys
 d=open(sys.argv[1],'rb').read()
 print(len(re.findall(rb'/Type\s*/Page[^s]', d)))" "$USCITA")
 
-# La stessa copia va anche nel repository, per chi vuole scaricarsi la guida
-# senza comprare il dispositivo. Copiarla qui in automatico e' l'unico modo
-# per essere sicuri che le due non divergano: se restasse da fare a mano,
-# prima o poi si ristampa il foglio e ci si dimentica di aggiornare GitHub,
-# e chi scarica il PDF si ritrova tre parole d'impronta che non sono piu'
-# quelle del firmware consegnato.
-cp "$USCITA" "$CARTELLA/PRISMA - GUIDA PRATICA.pdf"
+# La copia in piu' si fa in automatico, non a mano: se restasse da fare a
+# mano, prima o poi si ristampa il foglio e ci si dimentica di aggiornare
+# l'altra copia, e chi la usa si ritrova tre parole d'impronta che non sono
+# piu' quelle del firmware consegnato.
+if [ -n "$COPIA_LOCALE" ] && [ -d "$(dirname "$COPIA_LOCALE")" ]; then
+  cp "$USCITA" "$COPIA_LOCALE"
+  echo "  copia anche in: $COPIA_LOCALE"
+fi
 
-echo "PDF creato: $USCITA"
-echo "  copia nel repository: guida/PRISMA - GUIDA PRATICA.pdf"
+echo "PDF creato: guida/PRISMA - GUIDA PRATICA.pdf"
 echo "Pagine: $PAGINE"
 if [ "$PAGINE" != "2" ]; then
   echo "ATTENZIONE: la guida deve stare in DUE pagine (un foglio fronte/retro)."

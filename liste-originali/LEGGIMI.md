@@ -79,7 +79,7 @@ Non basta sostituire il file. La procedura è:
 1. scaricare la nuova versione e **guardarla**, confrontandola con la vecchia;
 2. aggiornare `impronta_attesa` dentro `prepara_diceware.py`;
 3. sostituire il file in questa cartella e aggiornare lo SHA-256 qui sopra;
-4. rilanciare `prepara_diceware.py`, `test_diceware.py` e `installa.py`;
+4. rilanciare `prepara_diceware.py`, `test_diceware.py` e `crea_uf2.py`;
 5. rifare la guida con `guida/build.sh`: cambiando la lista cambia il
    firmware, e quindi cambiano le tre parole dell'impronta stampate sul
    foglio. `build.sh` da solo si rifiuta di stampare se non le si aggiorna.
