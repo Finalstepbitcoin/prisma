@@ -58,6 +58,17 @@ tranne i due che impacchettano il file unico e disegnano il QR: quelli
 vogliono una libreria ciascuno, installata in un ambiente isolato e con
 l'impronta verificata (vedi `LEGGIMI-uf2.md`).
 
+**Prima di tutto, MicroPython.** Non sta in questo repository, ed e' una
+scelta: va preso dalla fonte, non dalle mani di chi ti vende il dispositivo.
+Scarica da [micropython.org](https://micropython.org/download/RPI_PICO2/) la
+versione per **Raspberry Pi Pico 2** e mettila nella cartella `firmware/`.
+
+Quella usata qui e' `RPI_PICO2-20260406-v1.28.0.uf2`, SHA-256
+`e65ad62a…b6ae`. Non e' un consiglio: gli script **rifiutano** qualunque
+altro file, anche un `.uf2` di MicroPython legittimo ma di un'altra
+versione. E' il motivo per cui due persone diverse, partendo dallo stesso
+sorgente, ottengono un file finale **identico byte per byte**.
+
 ```bash
 # 1. scarica dizionario e liste dalle fonti ufficiali, e disegna il QR
 python3 prepara_wordlist.py
