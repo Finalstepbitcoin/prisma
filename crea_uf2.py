@@ -101,7 +101,21 @@ def costruisci_archivio():
     stesso identico risultato. E' la stessa ragione per cui il dispositivo
     non scrive niente da solo.
     """
-    from littlefs import LittleFS
+    try:
+        from littlefs import LittleFS
+    except ImportError:
+        # Senza questo messaggio si vedrebbe solo un errore di Python, e chi
+        # non programma non saprebbe che gli manca una libreria, ne' quale.
+        print("ERRORE: manca la libreria littlefs, che serve a impacchettare")
+        print("i file del programma dentro il .uf2.")
+        print()
+        print("Si installa nell'ambiente isolato del progetto, verificandone")
+        print("l'impronta: la procedura completa e' in LEGGIMI-uf2.md, sotto")
+        print("\"La libreria in piu'\".")
+        print()
+        print("Non serve per verificare i calcoli: test_bip39.py e")
+        print("test_diceware.py girano con la sola libreria standard.")
+        sys.exit(1)
 
     fs = LittleFS(block_size=BLOCCO,
                   block_count=ARCHIVIO_BYTE // BLOCCO,
