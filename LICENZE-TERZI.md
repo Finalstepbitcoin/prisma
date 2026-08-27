@@ -19,7 +19,7 @@ sotto e ripetuta nel `LEGGIMI.md` di quella cartella.
 ## Dizionario BIP39 (inglese, 2048 parole)
 
 - **Fonte**: [repository ufficiale dei BIP](https://github.com/bitcoin/bips/blob/master/bip-0039/english.txt)
-- **Standard**: [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039/bip-0039.mediawiki)
+- **Standard**: [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
 - Fa parte della specifica pubblica di Bitcoin.
 
 ## Lista Diceware inglese (7776 voci)
