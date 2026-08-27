@@ -74,6 +74,14 @@ if [ -n "$COPIA_LOCALE" ] && [ -d "$(dirname "$COPIA_LOCALE")" ]; then
   echo "  copia anche in: $COPIA_LOCALE"
 fi
 
+# Sul foglio c'e' scritto di confrontare le tre parole con quelle pubblicate
+# su Nostr. Se la nota non c'e', quella riga manda il lettore nel vuoto.
+echo
+echo "RICORDA: sul foglio c'e' scritto di confrontare le tre parole con"
+echo "quelle pubblicate su Nostr. Prima di stampare, pubblica la nota con"
+echo "  $ATTESE"
+echo "Il testo gia' pronto lo stampa crea_uf2.py."
+echo
 echo "PDF creato: guida/PRISMA - GUIDA PRATICA.pdf"
 echo "Pagine: $PAGINE"
 if [ "$PAGINE" != "2" ]; then

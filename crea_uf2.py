@@ -273,6 +273,42 @@ def main():
     print("\nSi carica cosi': tieni premuto BOOTSEL mentre colleghi il cavo,")
     print("compare un disco, ci trascini sopra questo file. Basta.")
 
+    # ------------------------------------------------------------------
+    # IL PROMEMORIA NOSTR.
+    #
+    # Sul foglio stampato c'e' scritto di confrontare le tre parole con
+    # quelle pubblicate su Nostr. Se la nota non viene pubblicata, quella
+    # riga manda il lettore nel vuoto - ed e' peggio che non averla
+    # scritta, perche' insegna a ignorare le verifiche. Le parole cambiano
+    # a ogni riga toccata nel firmware, quindi la nota va rifatta a ogni
+    # release: qui sotto esce gia' pronta da copiare.
+    # le stesse tre parole che calcola prepara_impronta.py, dalla stessa
+    # funzione: non ricalcolate qui, per non rischiare che divergano
+    parole = "  ".join(w.upper() for w in imp.calcola_parole(uf2_micropython)[1])
+    print("\n" + "=" * 62)
+    print("  DA PUBBLICARE SU NOSTR, PRIMA DI STAMPARE IL FOGLIO")
+    print("=" * 62)
+    print("""
+PRISMA %s - calcolatore BIP39 offline
+
+Impronta del firmware di questa release. All'accensione il
+dispositivo deve mostrare esattamente queste tre parole:
+
+%s
+
+File:    prisma-%s.uf2
+SHA-256: %s
+
+Codice, file da caricare e guida:
+https://github.com/Finalstepbitcoin/prisma/releases/tag/v%s
+
+Il file si ricostruisce dal sorgente e viene identico, byte per
+byte: non e' necessario fidarsi di me.
+
+#bitcoin #nostr
+""" % (VERSIONE, parole, VERSIONE, impronta_file, VERSIONE))
+    print("=" * 62)
+
 
 if __name__ == "__main__":
     main()
