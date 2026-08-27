@@ -128,11 +128,17 @@ def leggi_uf2(percorso):
     fuori = []
     for i in range(len(dati) // 512):
         b = dati[i * 512:(i + 1) * 512]
-        m0, m1, _, indirizzo, quanti = struct.unpack("<5I", b[:20])
+        m0, m1, bandiere, indirizzo, quanti = struct.unpack("<5I", b[:20])
         famiglia = struct.unpack("<I", b[28:32])[0]
         if m0 != UF2_MAGIC0 or m1 != UF2_MAGIC1:
             continue
-        fuori.append((indirizzo, b[32:32 + quanti], famiglia))
+        # Le bandiere vanno CONSERVATE, non ricostruite. Il primo blocco dei
+        # .uf2 per RP2350 ha anche il bit 0x8000 ("qui dentro ci sono tag di
+        # estensione"): riscrivendolo come un blocco qualunque si perde, e il
+        # caricatore del Pico non riconosce piu' l'immagine e non riavvia.
+        numero, totale = struct.unpack("<2I", b[20:28])
+        fuori.append((indirizzo, b[32:32 + quanti], famiglia, bandiere,
+                      numero, totale))
     return fuori
 
 
@@ -144,18 +150,37 @@ def scrivi_uf2(blocchi, percorso):
     proprio numero e QUANTI sono in tutto. Accodando semplicemente due file
     uno all'altro, i blocchi di MicroPython continuerebbero a dichiarare il
     totale vecchio, e il caricatore del Pico crederebbe di aver finito a
-    meta' strada. Per questo qui si riscrivono tutte e due le cifre: i dati
-    restano identici, cambia solo la numerazione.
+    meta' strada.
+
+    MA LA NUMERAZIONE NON E' UNICA: il caricatore tiene un conto separato
+    per ogni "famiglia" di blocchi. Il .uf2 di MicroPython per RP2350 ne ha
+    due: un blocco solo di famiglia ABSOLUTE (che dichiara un totale di 2, e
+    resta apposta incompleto) e 1282 blocchi della famiglia del chip. Se si
+    rinumera tutto in un'unica sequenza, come si faceva prima, la famiglia
+    del chip non riceve mai il suo blocco numero 0 e quella ABSOLUTE aspetta
+    blocchi che non arriveranno: nessuna delle due si completa e il
+    dispositivo NON si riavvia mai. Provato sull'hardware il 27/08/2026.
+
+    Quindi: le famiglie a cui aggiungiamo blocchi si rinumerano daccapo,
+    quelle che restano come sono non si toccano.
     """
-    totale = len(blocchi)
+    nuove = {b[2] for b in blocchi if b[4] is None}
+    quanti_per_famiglia = {}
+    for b in blocchi:
+        quanti_per_famiglia[b[2]] = quanti_per_famiglia.get(b[2], 0) + 1
+    contatore = {}
     with open(percorso, "wb") as f:
-        for n, (indirizzo, dati, famiglia) in enumerate(blocchi):
+        for indirizzo, dati, famiglia, bandiere, numero, totale in blocchi:
+            if famiglia in nuove:
+                numero = contatore.get(famiglia, 0)
+                contatore[famiglia] = numero + 1
+                totale = quanti_per_famiglia[famiglia]
             intestazione = struct.pack(
-                "<8I", UF2_MAGIC0, UF2_MAGIC1, UF2_FLAG_FAMIGLIA,
-                indirizzo, len(dati), n, totale, famiglia)
+                "<8I", UF2_MAGIC0, UF2_MAGIC1, bandiere,
+                indirizzo, len(dati), numero, totale, famiglia)
             f.write(intestazione + dati.ljust(476, b"\x00")
                     + struct.pack("<I", UF2_MAGIC_FINE))
-    return totale
+    return len(blocchi)
 
 
 def blocchi_da(immagine, indirizzo_base, famiglia):
@@ -183,7 +208,8 @@ def blocchi_da(immagine, indirizzo_base, famiglia):
         pezzo = immagine[scarto:scarto + CARICO]
         if pezzo == b"\xff" * CARICO:
             continue
-        fuori.append((indirizzo_base + scarto, pezzo, famiglia))
+        fuori.append((indirizzo_base + scarto, pezzo, famiglia,
+                      UF2_FLAG_FAMIGLIA, None, None))
     return fuori
 
 
@@ -205,8 +231,8 @@ def main():
     immagine = costruisci_archivio()
 
     blocchi_firmware = leggi_uf2(uf2_micropython)
-    famiglia = next(f for _, _, f in blocchi_firmware
-                    if f == imp.FAMIGLIA_RP2350)
+    famiglia = next(b[2] for b in blocchi_firmware
+                    if b[2] == imp.FAMIGLIA_RP2350)
     blocchi_archivio = blocchi_da(immagine, INIZIO_FLASH + ARCHIVIO_INIZIO,
                                   famiglia)
 

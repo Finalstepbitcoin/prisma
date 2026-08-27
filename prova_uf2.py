@@ -87,11 +87,38 @@ def main():
              "un blocco dichiara piu' di 256 byte utili")
 
     # LA NUMERAZIONE: e' il punto in cui accodare due file rompe tutto.
-    verifica([b["numero"] for b in blocchi] == list(range(len(blocchi))),
-             "i blocchi non sono numerati di fila da 0")
-    verifica(all(b["totale"] == len(blocchi) for b in blocchi),
-             "non tutti i blocchi dichiarano lo stesso totale")
-    print("  %d blocchi, firme e numerazione ............ ok" % len(blocchi))
+    #
+    # Ma va contata PER FAMIGLIA, non su tutto il file: il caricatore del
+    # Pico tiene un conto separato per ognuna. Il .uf2 di MicroPython per
+    # RP2350 ne ha due, e quella del chip e' l'unica a cui aggiungiamo
+    # blocchi. Pretendere una numerazione unica su tutto il file - come
+    # faceva questo controllo fino al 27/08/2026 - vuol dire produrre un
+    # file che il dispositivo non carica: provato sull'hardware.
+    per_famiglia = {}
+    for b in blocchi:
+        per_famiglia.setdefault(b["famiglia"], []).append(b)
+
+    nostra = per_famiglia.get(imp.FAMIGLIA_RP2350, [])
+    verifica([b["numero"] for b in nostra] == list(range(len(nostra))),
+             "i blocchi del chip non sono numerati di fila da 0")
+    verifica(all(b["totale"] == len(nostra) for b in nostra),
+             "i blocchi del chip non dichiarano tutti lo stesso totale")
+
+    # Le altre famiglie devono uscire IDENTICHE a come sono entrate.
+    originali = {}
+    for b in leggi_blocchi(ufficiale):
+        if b["famiglia"] != imp.FAMIGLIA_RP2350:
+            originali.setdefault(b["famiglia"], []).append(
+                (b["numero"], b["totale"], b["bandiere"], b["indirizzo"]))
+    intatte = all(
+        [(b["numero"], b["totale"], b["bandiere"], b["indirizzo"])
+         for b in v] == originali.get(f, [])
+        for f, v in per_famiglia.items() if f != imp.FAMIGLIA_RP2350)
+    verifica(intatte,
+             "le famiglie che non tocchiamo sono state alterate")
+
+    print("  %d blocchi in %d famiglie, firme e numerazione .. ok"
+          % (len(blocchi), len(per_famiglia)))
 
     # ------------------------------------------------------------------
     titolo("2. MicroPython non e' stato toccato")
