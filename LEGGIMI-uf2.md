@@ -30,7 +30,10 @@ cambia solo il modo in cui i file ci arrivano dentro.
 littlefs 2.11.2 — la stessa che gira dentro MicroPython sul dispositivo).
 
 Va installata **solo nell'ambiente isolato**, mai nel Python di sistema, e
-sempre verificando l'impronta del pacchetto:
+sempre verificando l'impronta del pacchetto. I comandi qui sotto sono per
+**Mac con chip Apple**: su un altro sistema cambia il nome del pacchetto, e
+con esso l'impronta da confrontare — quella giusta si prende dalla pagina
+del progetto su PyPI.
 
 ```bash
 python3 -m venv .venv-strumenti
@@ -86,19 +89,27 @@ cancella l'intero settore da 4096 byte prima di scriverne anche un pezzo, e
 l'elenco dei file (i primi due blocchi) viene riscritto per intero, quindi
 niente di vecchio resta raggiungibile.
 
-## DA FARE: la prova sull'hardware
+## La prova sull'hardware: fatta il 27 agosto 2026
 
-Tutto quello che si poteva verificare senza dispositivo è verificato
-(`prova_uf2.py`, 12 controlli). Resta la prova vera:
+Caricato su un Pico 2 vero: il disco si smonta da solo, il dispositivo
+riparte e mostra `Prisma 1.0` con le tre parole dell'impronta.
 
-1. tenere premuto BOOTSEL, collegare il cavo, trascinare `prisma-1.0.uf2`
-2. il dispositivo deve **ripartire da solo** e mostrare `BLAST SAIL SPOIL`
-3. controllare che i due modi funzionino (checksum e passphrase)
-4. `python3 parla_col_pico.py elenco` deve elencare esattamente dieci file
+**La prima prova ha bocciato il file**, ed e' servita esattamente a questo.
+Il dispositivo restava fermo in BOOTSEL: il file veniva scritto per intero,
+nessun errore da nessuna parte, ma niente riavvio. Il motivo era la
+numerazione dei blocchi, che il caricatore conta **per famiglia** e non su
+tutto il file (il dettaglio sta nel commento dentro `crea_uf2.py`). I dodici
+controlli passavano lo stesso, perche' due di essi pretendevano proprio la
+regola sbagliata: sono stati riscritti.
 
-Se qualcosa non va, il sintomo dice dove guardare:
+Se un domani qualcosa non andasse, il sintomo dice dove guardare:
+
+- **il disco resta montato e non riparte** → la numerazione dei blocchi
 - **si accende ma resta muto** → i parametri dell'archivio non combaciano
 - **riparte in modo continuo** → problema nel firmware, non nell'archivio
-- **tre parole diverse** → nell'archivio è finito qualcosa in più o in meno
+- **tre parole diverse da quelle attese** → nell'archivio e' finito qualcosa
+  in piu' o in meno
 
-Finché questa prova non è fatta, il ramo non va unito a `main`.
+**Su macOS il file va trascinato dal Finder**, non copiato da terminale:
+`cp` scrive i settori in un ordine che il caricatore non accetta, non da'
+errore, e il dispositivo resta fermo senza che nulla lo segnali.

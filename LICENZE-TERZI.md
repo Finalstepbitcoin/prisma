@@ -62,6 +62,19 @@ Il dispositivo esegue [MicroPython](https://micropython.org/) (licenza MIT).
 
 ---
 
+## Le due librerie usate per costruire
+
+Non finiscono dentro il dispositivo: servono sul computer, al momento di
+preparare i file. Le citiamo lo stesso, perche' chi ricostruisce il progetto
+le scarica.
+
+- **littlefs-python** (BSD-3-Clause), di Jurg Rast — impacchetta i file del
+  programma nell'archivio del `.uf2`. E' un involucro attorno alla libreria C
+  littlefs, la stessa che gira dentro MicroPython.
+  <https://github.com/jrast/littlefs-python>
+- **segno** (BSD-3-Clause) — disegna i codici QR stampati sulla guida.
+  <https://github.com/heuer/segno>
+
 ## Cosa significa in pratica
 
 **Il codice di questo repository è MIT**: chiunque può prenderlo e farne quello
