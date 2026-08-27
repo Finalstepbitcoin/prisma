@@ -939,7 +939,7 @@ class Interfaccia:
             self._centrata("non disponibile", 124, s.GIALLO, 1)
 
         self.sc.hline(20, 172, 200, s.colore(60, 60, 60))
-        self._centrata("il tuo generatore offline", 180, s.BIANCO, 1)
+        self._centrata("il tuo calcolatore offline", 180, s.BIANCO, 1)
         self._centrata("Prisma " + VERSIONE, 194, s.GRIGIO, 1)
         self._piede("A) avanti")
         self.sc.mostra()
