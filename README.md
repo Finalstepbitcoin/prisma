@@ -12,6 +12,26 @@ Canale YouTube: [Final Step Bitcoin](https://www.youtube.com/@final_step_bitcoin
 
 ---
 
+## Hai montato i pezzi. E adesso?
+
+**Scarica un file solo e trascinalo.** Non serve installare niente sul
+computer: ne' Python, ne' librerie, ne' le liste di parole.
+
+1. prendi **`prisma-1.0.uf2`** dall'ultima
+   [release](https://github.com/Finalstepbitcoin/prisma/releases/latest);
+2. tieni premuto **BOOTSEL** mentre colleghi il cavo micro-USB: compare un
+   disco chiamato **RP2350**;
+3. **trascina** il file su quel disco.
+
+Il dispositivo riparte da solo e all'accensione mostra tre parole: devono
+essere quelle scritte nella release.
+
+**Se non ti fidi di quel file**, non usarlo: [costruiscitelo](#come-si-costruisce)
+dal sorgente e verifica che venga identico, byte per byte. E' fatto apposta
+perche' venga sempre lo stesso.
+
+---
+
 ## Cosa serve
 
 | Pezzo | Codice | Prezzo |
