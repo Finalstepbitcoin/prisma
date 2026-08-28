@@ -19,4 +19,4 @@ Le impostazioni consigliate da chi l'ha disegnata:
 - materiale **PLA**
 - altezza strato **0,20 mm**
 - **2 pareti**, riempimento **15%**
-- circa **40 minuti** in tutto, un piatto solo
+- circa **40 minuti** in tutto
