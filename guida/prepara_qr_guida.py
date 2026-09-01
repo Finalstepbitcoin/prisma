@@ -50,11 +50,14 @@ QR = [
     {
         "nome": "video",
         "classe": "qr-video",
-        # SEGNAPOSTO: qui va il link diretto alla video guida, quando c'e'.
-        # Per ora punta al canale, cosi' chi inquadra non finisce su un
-        # errore - ma va sostituito prima di stampare.
-        "indirizzo": "https://www.youtube.com/@final_step_bitcoin",
-        "a_cosa_serve": "la video guida (SEGNAPOSTO: ancora il canale)",
+        # Link diretto alla video guida. L'identificativo del video lo
+        # assegna YouTube al caricamento e non cambia mai: passare da
+        # privato a pubblico non lo tocca. Cambia SOLO se il video viene
+        # cancellato e ricaricato - e con un QR gia' stampato quel video
+        # non si cancella piu': si sostituisce il contenuto tenendo lo
+        # stesso video.
+        "indirizzo": "https://youtu.be/CFRjoe49_qk",
+        "a_cosa_serve": "la video guida",
     },
 ]
 CARTELLA = os.path.dirname(os.path.abspath(__file__))
