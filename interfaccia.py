@@ -27,7 +27,7 @@ import bip39_checksum as bip39
 import diceware as dw
 import schermo as s
 
-VERSIONE = "1.0"
+VERSIONE = "1.1"
 
 DA_INSERIRE = {12: 11, 24: 23}
 # bit di entropia liberi nell'ultima parola: sono questi a generare
@@ -390,16 +390,19 @@ class Interfaccia:
         righe = (len(lettere) + self.COLONNE - 1) // self.COLONNE
         while True:
             self._intestazione("INIZIALE")
-            LARG, ALT, Y0 = 46, 34, 60
+            # Stesse identiche misure della griglia di chiedi_parola, che
+            # con l'alfabeto intero fa cinque righe e ci sta. Con le righe
+            # da 34 le ultime lettere finivano sopra "A) ok" e "B) tutte".
+            LARG, ALT, Y0 = 46, 30, 62
             X0 = (240 - self.COLONNE * LARG) // 2
             for i, L in enumerate(lettere):
                 r, c = i // self.COLONNE, i % self.COLONNE
                 x, y = X0 + c * LARG, Y0 + r * ALT
                 if i == sel:
                     self.sc.fill_rect(x, y, LARG - 2, ALT - 2, s.ARANCIO)
-                    self.sc.scritta(L, x + 15, y + 9, s.NERO, 2)
+                    self.sc.scritta(L, x + 15, y + 7, s.NERO, 2)
                 else:
-                    self.sc.scritta(L, x + 15, y + 9, s.BIANCO, 2)
+                    self.sc.scritta(L, x + 15, y + 7, s.BIANCO, 2)
             self._piede("A) ok", "B) tutte")
             self.sc.mostra()
             t = self.cm.attendi()
